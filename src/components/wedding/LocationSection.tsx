@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getMapEmbedUrl } from "@/lib/maps";
 
 interface LocationSectionProps {
   venueName: string;
@@ -28,9 +29,7 @@ function LocationCard({
   mapLink?: string | null;
   t: ReturnType<typeof useTranslations<"location">>;
 }) {
-  const embedUrl =
-    process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL ||
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.5!2d38.7469!3d9.0320";
+  const embedUrl = getMapEmbedUrl(name, address);
 
   return (
     <ScrollReveal>

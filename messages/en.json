@@ -72,7 +72,8 @@
     "message": "Message to the Couple",
     "submit": "Send Confirmation",
     "success": "Thank you! Your confirmation has been received.",
-    "fireworks": "We can't wait to celebrate with you!"
+    "fireworks": "We can't wait to celebrate with you!",
+    "error": "Could not submit your confirmation. Please try again."
   },
   "guestbook": {
     "title": "Guestbook",

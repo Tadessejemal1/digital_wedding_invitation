@@ -29,9 +29,18 @@ export function Navigation() {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <a href="#home" className={`font-display text-xl ${scrolled ? "text-wine" : "text-white"}`}>
-            T & H
-          </a>
+          <div className="flex items-center gap-3">
+            <button
+              className={`lg:hidden ${scrolled ? "text-wine" : "text-white"}`}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+            <a href="#home" className={`font-display text-xl ${scrolled ? "text-wine" : "text-white"}`}>
+              T & H
+            </a>
+          </div>
 
           <div className="hidden items-center gap-6 lg:flex">
             {navKeys.map((key) => (
@@ -47,23 +56,15 @@ export function Navigation() {
             ))}
             <LanguageSwitcher />
           </div>
-
-          <button
-            className={`lg:hidden ${scrolled ? "text-wine" : "text-white"}`}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
       </motion.nav>
 
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
+            initial={{ opacity: 0, x: "-100%" }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
+            exit={{ opacity: 0, x: "-100%" }}
             className="fixed inset-0 z-50 flex flex-col bg-wine pt-20 lg:hidden"
           >
             <div className="flex flex-col gap-6 px-8">

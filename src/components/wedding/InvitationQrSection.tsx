@@ -37,7 +37,7 @@ export function InvitationQrSection({ coupleId, slug }: InvitationQrSectionProps
 
     try {
       const res = await fetch(
-        `/api/guests/lookup?coupleId=${encodeURIComponent(coupleId)}&q=${encodeURIComponent(query.trim())}`
+        `/api/guests/lookup?slug=${encodeURIComponent(slug)}&coupleId=${encodeURIComponent(coupleId)}&q=${encodeURIComponent(query.trim())}`
       );
       const data = await res.json();
 

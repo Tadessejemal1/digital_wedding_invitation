@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateQrCode } from "@/lib/utils";
+import { resolveCoupleId } from "@/lib/couple";
 import { z } from "zod";
 
 const rsvpSchema = z.object({
-  coupleId: z.string(),
+  coupleId: z.string().optional(),
+  slug: z.string().optional(),
   name: z.string().min(1),
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
@@ -20,9 +22,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = rsvpSchema.parse(body);
 
+    const coupleId = await resolveCoupleId(data.coupleId, data.slug);
+    if (!coupleId) {
+      return NextResponse.json(
+        { error: "Wedding not found. Please check the database connection and seed data." },
+        { status: 404 }
+      );
+    }
+
     let guest = await prisma.guest.findFirst({
       where: {
-        coupleId: data.coupleId,
+        coupleId,
         OR: [
           ...(data.email ? [{ email: data.email }] : []),
           ...(data.phone ? [{ phone: data.phone }] : []),
@@ -34,7 +44,7 @@ export async function POST(request: NextRequest) {
     if (!guest) {
       guest = await prisma.guest.create({
         data: {
-          coupleId: data.coupleId,
+          coupleId,
           name: data.name,
           email: data.email || null,
           phone: data.phone || null,
@@ -63,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
 
     const couple = await prisma.couple.findUnique({
-      where: { id: data.coupleId },
+      where: { id: coupleId },
       select: { slug: true },
     });
 
@@ -75,8 +85,11 @@ export async function POST(request: NextRequest) {
       slug: couple?.slug || process.env.INVITE_SLUG || "TADESSE-HANA",
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Invalid RSVP data", details: error.flatten() }, { status: 400 });
+    }
     console.error("RSVP error:", error);
-    return NextResponse.json({ error: "Failed to submit RSVP" }, { status: 400 });
+    return NextResponse.json({ error: "Failed to submit RSVP" }, { status: 500 });
   }
 }
 

@@ -27,7 +27,7 @@ async function main() {
       journey: journeyStory,
       invitationMessage:
         "With great joy and gratitude, we invite you to join us as we begin our new journey together. Your presence will make our celebration complete.",
-      weddingDate: new Date("2026-07-27T10:00:00.000Z"),
+      weddingDate: new Date("2026-07-26T10:00:00.000Z"),
       venueName: "Holy Trinity Cathedral",
       venueAddress: "Arat Kilo, Addis Ababa, Ethiopia",
       receptionName: "Skylight Hotel",

@@ -38,24 +38,30 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const [showFireworks, setShowFireworks] = useState(false);
   const [rsvpResult, setRsvpResult] = useState<RsvpResult | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, coupleId }),
+        body: JSON.stringify({ ...form, coupleId, slug }),
       });
       const data = await res.json();
       if (res.ok) {
         setSuccess(true);
         setRsvpResult(data);
         if (form.attending) setShowFireworks(true);
+      } else {
+        setError(data.error || t("error"));
       }
+    } catch {
+      setError(t("error"));
     } finally {
       setLoading(false);
     }
@@ -132,6 +138,7 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
           <Button type="submit" variant="gold" size="lg" className="w-full" disabled={loading}>
             {loading ? "..." : t("submit")}
           </Button>
+          {error && <p className="text-center text-sm text-red-200">{error}</p>}
         </form>
       </ScrollReveal>
     </section>

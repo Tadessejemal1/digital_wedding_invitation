@@ -46,6 +46,62 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Deploy to Vercel
+
+Vercel cannot use `localhost:5435`. You need a **cloud PostgreSQL** database (Render, Neon, Supabase, etc.).
+
+### 1. Create a production database
+
+Create a **new** Postgres database for this wedding app. Do not reuse unrelated databases.
+
+For **Render Postgres**, copy the **External** connection string and add SSL:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
+```
+
+### 2. Set Vercel environment variables
+
+In Vercel → Project → Settings → Environment Variables, add:
+
+| Variable | Example |
+|----------|---------|
+| `DATABASE_URL` | Your cloud Postgres URL with `?sslmode=require` |
+| `JWT_SECRET` | A long random secret |
+| `ADMIN_PASSWORD` | Your admin password |
+| `INVITE_SLUG` | `TADESSE-HANA` |
+| `INVITE_PASSWORD` | `love2026` |
+| `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL` | Optional. Leave unset to auto-embed from venue name/address. Do not use placeholder `pb` URLs from docs. |
+
+Apply to **Production**, **Preview**, and **Development** on Vercel.
+
+### 3. Push schema and seed production data
+
+Run once from your machine (replace with your production URL):
+
+```bash
+DATABASE_URL="postgresql://..." npm run db:push
+DATABASE_URL="postgresql://..." npm run db:seed
+```
+
+### 4. Redeploy
+
+After saving env vars, redeploy the project on Vercel.
+
+### 5. Verify deployment
+
+```bash
+curl https://your-app.vercel.app/api/health
+```
+
+You should see:
+
+```json
+{ "ok": true, "database": "connected", "couple": "TADESSE-HANA" }
+```
+
+If RSVP still fails, check `/api/health` first — it usually means `DATABASE_URL` is missing, still pointing to localhost, or the database was not seeded.
+
 ## Routes
 
 | Route | Description |

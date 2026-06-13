@@ -28,7 +28,7 @@ export function HeroSection({
 }: HeroProps) {
   const t = useTranslations("hero");
   const locale = useLocale();
-  const { unlocked, setUnlocked, requirePassword: gateRequired } = useInviteUnlock();
+  const { unlocked, setUnlocked, requirePassword: gateRequired, playWeddingMusic } = useInviteUnlock();
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const isLocked = (requirePassword || gateRequired) && !unlocked;
@@ -41,6 +41,7 @@ export function HeroSection({
       body: JSON.stringify({ code }),
     });
     if (res.ok) {
+      playWeddingMusic();
       setUnlocked(true);
       onUnlock?.();
     } else {
@@ -62,9 +63,11 @@ export function HeroSection({
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
       </div>
 
-      <div className="absolute right-4 top-4 z-20 md:right-8 md:top-8">
-        <LanguageSwitcher />
-      </div>
+      {isLocked && (
+        <div className="absolute right-4 top-4 z-20 md:right-8 md:top-8">
+          <LanguageSwitcher />
+        </div>
+      )}
 
       {isLocked ? (
         <motion.div

@@ -56,6 +56,10 @@ export function Navigation() {
             ))}
             <LanguageSwitcher />
           </div>
+
+          <div className="lg:hidden">
+            <LanguageSwitcher />
+          </div>
         </div>
       </motion.nav>
 

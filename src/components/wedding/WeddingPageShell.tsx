@@ -10,13 +10,15 @@ function WeddingChrome() {
   const { unlocked, requirePassword } = useInviteUnlock();
   const showChrome = !requirePassword || unlocked;
 
-  if (!showChrome) return null;
-
   return (
     <>
-      <FloatingFlowers />
-      <Navigation />
       <MusicPlayer />
+      {showChrome && (
+        <>
+          <FloatingFlowers />
+          <Navigation />
+        </>
+      )}
     </>
   );
 }

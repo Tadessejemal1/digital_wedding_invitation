@@ -105,6 +105,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         venueName={data.venueName}
         venueAddress={data.venueAddress}
         mapLink={data.mapLink}
+        receptionName={data.receptionName}
+        receptionAddress={data.receptionAddress}
+        receptionMapLink={data.receptionMapLink}
       />
       <FamilySection brideFamily={data.brideFamily} groomFamily={data.groomFamily} />
       <RsvpSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />

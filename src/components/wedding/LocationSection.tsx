@@ -29,7 +29,7 @@ function LocationCard({
   mapLink?: string | null;
   t: ReturnType<typeof useTranslations<"location">>;
 }) {
-  const embedUrl = getMapEmbedUrl(name, address);
+  const embedUrl = getMapEmbedUrl(name, address, mapLink);
 
   return (
     <ScrollReveal>
@@ -90,7 +90,7 @@ export function LocationSection({
         />
         {receptionName && receptionAddress && (
           <LocationCard
-            title={t("reception")}
+            title={t("parentsHome")}
             name={receptionName}
             address={receptionAddress}
             mapLink={receptionMapLink}

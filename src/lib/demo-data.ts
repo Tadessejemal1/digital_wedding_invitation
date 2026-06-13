@@ -1,6 +1,7 @@
 import { weddingImages, coupleInfo } from "./images";
 import { howTheyMetStory, journeyStory } from "./couple-story";
 import { weddingProgram } from "./couple-program";
+import { HOLY_TRINITY_MAP_LINK, PARENTS_HOME_MAP_LINK } from "./maps";
 
 export function getDemoCouple() {
   return {
@@ -18,10 +19,10 @@ export function getDemoCouple() {
     weddingDate: "2026-07-26T10:00:00.000Z",
     venueName: "Holy Trinity Cathedral",
     venueAddress: "Arat Kilo, Addis Ababa, Ethiopia",
-    receptionName: "Skylight Hotel",
-    receptionAddress: "Bole, Addis Ababa, Ethiopia",
-    mapLink: "https://maps.google.com/?q=Holy+Trinity+Cathedral+Addis+Ababa",
-    receptionMapLink: "https://maps.google.com/?q=Skylight+Hotel+Addis+Ababa",
+    receptionName: "Tadesse's Parents Home",
+    receptionAddress: "Addis Ababa, Ethiopia",
+    mapLink: HOLY_TRINITY_MAP_LINK,
+    receptionMapLink: PARENTS_HOME_MAP_LINK,
     coverImage: weddingImages.hero,
     invitePassword: "love2026",
     groomFamily: "Mr. & Mrs. Tesfaye Kebede\nBrothers: Dawit & Yonas",

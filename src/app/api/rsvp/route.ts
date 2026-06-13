@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateQrCode } from "@/lib/utils";
 import { resolveCoupleId } from "@/lib/couple";
+import { getDatabaseErrorMessage } from "@/lib/db-errors";
 import { z } from "zod";
 
 const rsvpSchema = z.object({
@@ -87,6 +88,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid RSVP data", details: error.flatten() }, { status: 400 });
+    }
+    const dbMessage = getDatabaseErrorMessage(error);
+    if (dbMessage) {
+      console.error("RSVP database error:", error);
+      return NextResponse.json({ error: dbMessage }, { status: 503 });
     }
     console.error("RSVP error:", error);
     return NextResponse.json({ error: "Failed to submit RSVP" }, { status: 500 });

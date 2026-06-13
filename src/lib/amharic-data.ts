@@ -8,8 +8,8 @@ export const amharicData = {
   invitationMessage: "በታላቅ ደስታ እና ምስጋና፣ የጋብቻ ስነ-ስርዓታችንን ለመከበር በደስታ እንጋብዛችኋለን። የእናንተ መገኘት በዓላችንን የተሟላ ያደርገዋል።",
   venueName: "መንበረ ጸባኦት ቅድስት ሥላሴ ካቴድራል",
   venueAddress: "አራት ኪሎ፣ አዲስ አበባ፣ ኢትዮጵያ",
-  receptionName: "ስካይላይት ሆቴል",
-  receptionAddress: "ቦሌ፣ አዲስ አበባ፣ ኢትዮጵያ",
+  receptionName: "የታደሰ ወላጆች ቤት",
+  receptionAddress: "አዲስ አበባ፣ ኢትዮጵያ",
   groomFamily: "ወ/ሮ ተስፋዬ ከበደ እና ቤተሰባቸው\nወንድሞች፡ ዳዊት እና ዮናስ",
   brideFamily: "ወ/ሮ አልማዝ ደስታ እና ቤተሰባቸው\nእህቶች፡ ሰላም እና ቤተልሔም",
   program: {

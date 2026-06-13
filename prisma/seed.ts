@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { weddingImages, coupleInfo } from "../src/lib/images";
 import { howTheyMetStory, journeyStory } from "../src/lib/couple-story";
 import { weddingProgram } from "../src/lib/couple-program";
+import { HOLY_TRINITY_MAP_LINK, PARENTS_HOME_MAP_LINK } from "../src/lib/maps";
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,12 @@ async function main() {
       coverImage: weddingImages.hero,
       howTheyMet: howTheyMetStory,
       journey: journeyStory,
+      venueName: "Holy Trinity Cathedral",
+      venueAddress: "Arat Kilo, Addis Ababa, Ethiopia",
+      receptionName: "Tadesse's Parents Home",
+      receptionAddress: "Addis Ababa, Ethiopia",
+      mapLink: HOLY_TRINITY_MAP_LINK,
+      receptionMapLink: PARENTS_HOME_MAP_LINK,
     },
     create: {
       slug: coupleInfo.slug,
@@ -30,10 +37,10 @@ async function main() {
       weddingDate: new Date("2026-07-26T10:00:00.000Z"),
       venueName: "Holy Trinity Cathedral",
       venueAddress: "Arat Kilo, Addis Ababa, Ethiopia",
-      receptionName: "Skylight Hotel",
-      receptionAddress: "Bole, Addis Ababa, Ethiopia",
-      mapLink: "https://maps.google.com/?q=Holy+Trinity+Cathedral+Addis+Ababa",
-      receptionMapLink: "https://maps.google.com/?q=Skylight+Hotel+Addis+Ababa",
+      receptionName: "Tadesse's Parents Home",
+      receptionAddress: "Addis Ababa, Ethiopia",
+      mapLink: HOLY_TRINITY_MAP_LINK,
+      receptionMapLink: PARENTS_HOME_MAP_LINK,
       coverImage: weddingImages.hero,
       invitePassword: "love2026",
       groomFamily: "Mr. & Mrs. Tesfaye Kebede\nBrothers: Dawit & Yonas",

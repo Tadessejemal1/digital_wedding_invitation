@@ -47,7 +47,8 @@
   },
   "location": {
     "title": "Venue & Directions",
-    "ceremony": "Ceremony Location",
+    "ceremony": "Holy Trinity Cathedral",
+    "parentsHome": "Tadesse's Parents Home",
     "reception": "Reception Location",
     "openMaps": "Open in Maps",
     "getDirections": "Get Directions"

@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["wedding"]
 }
 
 model Couple {
@@ -43,6 +44,7 @@ model Couple {
   guests  Guest[]
 
   @@map("couples")
+  @@schema("wedding")
 }
 
 model Gallery {
@@ -56,6 +58,7 @@ model Gallery {
   couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 
   @@map("gallery")
+  @@schema("wedding")
 }
 
 model Program {
@@ -68,12 +71,15 @@ model Program {
   couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 
   @@map("program")
+  @@schema("wedding")
 }
 
 enum GuestStatus {
   PENDING
   CHECKED_IN
   DECLINED
+
+  @@schema("wedding")
 }
 
 model Guest {
@@ -90,6 +96,7 @@ model Guest {
   rsvp   Rsvp?
 
   @@map("guests")
+  @@schema("wedding")
 }
 
 model Rsvp {
@@ -105,6 +112,7 @@ model Rsvp {
   guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
 
   @@map("rsvp")
+  @@schema("wedding")
 }
 
 model Guestbook {
@@ -114,4 +122,5 @@ model Guestbook {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("guestbook")
+  @@schema("wedding")
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { persistInviteUnlockState, readInviteUnlockState } from "@/lib/invite-unlock";
 
 type InviteUnlockContextValue = {
   unlocked: boolean;
@@ -19,8 +20,15 @@ export function InviteUnlockProvider({
   requirePassword: boolean;
   children: ReactNode;
 }) {
-  const [unlocked, setUnlocked] = useState(!requirePassword);
+  const [unlocked, setUnlockedState] = useState(() => !requirePassword);
   const playMusicRef = useRef<(() => void) | null>(null);
+
+  const setUnlocked = useCallback((value: boolean) => {
+    setUnlockedState(value);
+    if (requirePassword) {
+      persistInviteUnlockState(value);
+    }
+  }, [requirePassword]);
 
   const registerPlayWeddingMusic = useCallback((fn: (() => void) | null) => {
     playMusicRef.current = fn;
@@ -29,6 +37,12 @@ export function InviteUnlockProvider({
   const playWeddingMusic = useCallback(() => {
     playMusicRef.current?.();
   }, []);
+
+  useEffect(() => {
+    if (requirePassword && readInviteUnlockState()) {
+      setUnlockedState(true);
+    }
+  }, [requirePassword]);
 
   useEffect(() => {
     if (requirePassword && !unlocked) {

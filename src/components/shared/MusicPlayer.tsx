@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Music, Pause } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInviteUnlock } from "@/contexts/InviteUnlockContext";
+import {
+  persistMusicPausedByUser,
+  shouldAutoPlayMusic,
+} from "@/lib/invite-unlock";
 
 export function MusicPlayer() {
   const t = useTranslations("music");
@@ -13,34 +17,40 @@ export function MusicPlayer() {
   const mediaRef = useRef<HTMLVideoElement>(null);
   const showControls = !requirePassword || unlocked;
 
-  useEffect(() => {
-    registerPlayWeddingMusic(() => {
-      if (!mediaRef.current) return;
-      mediaRef.current
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
-    });
+  const playMedia = useCallback(() => {
+    if (!mediaRef.current) return;
+    mediaRef.current
+      .play()
+      .then(() => {
+        setPlaying(true);
+        persistMusicPausedByUser(false);
+      })
+      .catch(() => setPlaying(false));
+  }, []);
 
+  const pauseMedia = useCallback(() => {
+    if (!mediaRef.current) return;
+    mediaRef.current.pause();
+    setPlaying(false);
+    persistMusicPausedByUser(true);
+  }, []);
+
+  useEffect(() => {
+    registerPlayWeddingMusic(playMedia);
     return () => registerPlayWeddingMusic(null);
-  }, [registerPlayWeddingMusic]);
+  }, [registerPlayWeddingMusic, playMedia]);
 
   useEffect(() => {
-    if (!requirePassword) {
-      mediaRef.current
-        ?.play()
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
+    if (shouldAutoPlayMusic(requirePassword, unlocked)) {
+      playMedia();
     }
-  }, [requirePassword]);
+  }, [unlocked, requirePassword, playMedia]);
 
   const toggle = () => {
-    if (!mediaRef.current) return;
     if (playing) {
-      mediaRef.current.pause();
-      setPlaying(false);
+      pauseMedia();
     } else {
-      mediaRef.current.play().then(() => setPlaying(true)).catch(() => {});
+      playMedia();
     }
   };
 

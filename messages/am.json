@@ -11,7 +11,7 @@
     "gifts": "ስጦታ"
   },
   "hero": {
-    "together": "ቤተሰቦቻችንን ጋር በመሆን፣",
+    "together": "ቤተሰቦቻችን ጋር በመሆን፣",
     "invite": "የጋብቻ ስነ-ስርዓታችንን ለመከበር በደስታ እንጋብዛችኋለን።",
     "enterCode": "የግብዣ ኮድ ያስገቡ",
     "unlock": "ግብዣውን ይክፈቱ",
@@ -21,8 +21,8 @@
     "title": "የእኛ ታሪክ",
     "howWeMet": "እንዴት እንደተገናኘን",
     "ourJourney": "ጉዞያችን",
-    "bride": "ሙሽtera",
-    "groom": "ሙሽter"
+    "bride": "ሙሽሪት",
+    "groom": "ሙሽር"
   },
   "invitation": {
     "title": "የግል ግብዣ"
@@ -54,8 +54,8 @@
   },
   "family": {
     "title": "ቤተሰቦቻችን",
-    "brideFamily": "የሙሽtera ቤተሰብ",
-    "groomFamily": "የሙሽter ቤተሰብ"
+    "brideFamily": "የሙሽሪት ቤተሰብ",
+    "groomFamily": "የሙሽር ቤተሰብ"
   },
   "rsvp": {
     "title": "መገኘት ማረጋገጫ",
@@ -77,7 +77,7 @@
   },
   "guestbook": {
     "title": "የእንግዶች መዝገብ",
-    "subtitle": "እ 축복ዎችን እና መልእክቶችዎን ይተው",
+    "subtitle": "መልካም መልእክቶችዎን ይተው",
     "name": "ስምዎ",
     "message": "መልእክትዎ",
     "submit": "መልእክት ይተው",

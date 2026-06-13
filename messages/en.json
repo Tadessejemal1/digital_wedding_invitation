@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "Home",
+    "story": "Our Story",
+    "gallery": "Gallery",
+    "location": "Location",
+    "program": "Program",
+    "rsvp": "Attendance",
+    "checkIn": "Entrance QR",
+    "guestbook": "Guestbook",
+    "gifts": "Gifts"
+  },
+  "hero": {
+    "together": "Together with our families,",
+    "invite": "Joyfully invite you to celebrate our wedding ceremony.",
+    "enterCode": "Enter invitation code",
+    "unlock": "Unlock Invitation",
+    "wrongCode": "Incorrect invitation code. Please try again."
+  },
+  "story": {
+    "title": "Our Story",
+    "howWeMet": "How We Met",
+    "ourJourney": "Our Journey",
+    "bride": "The Bride",
+    "groom": "The Groom"
+  },
+  "invitation": {
+    "title": "Personal Invitation"
+  },
+  "countdown": {
+    "title": "Counting Down to Our Day",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
+  },
+  "program": {
+    "title": "Wedding Program"
+  },
+  "gallery": {
+    "title": "Photo Gallery",
+    "engagement": "Engagement Photos",
+    "family": "Family Photos",
+    "preWedding": "Pre-Wedding Photos",
+    "viewAll": "View All",
+    "allPhotos": "{count} photos from our journey"
+  },
+  "location": {
+    "title": "Venue & Directions",
+    "ceremony": "Ceremony Location",
+    "reception": "Reception Location",
+    "openMaps": "Open in Maps",
+    "getDirections": "Get Directions"
+  },
+  "family": {
+    "title": "Our Families",
+    "brideFamily": "Bride's Family",
+    "groomFamily": "Groom's Family"
+  },
+  "rsvp": {
+    "title": "Attendance",
+    "subtitle": "Please let us know if you can join us",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "attending": "Will you attend?",
+    "yes": "Joyfully Accept",
+    "no": "Regretfully Decline",
+    "guestCount": "Number of Guests",
+    "plusOne": "Bringing a +1?",
+    "dietary": "Dietary Requirements",
+    "message": "Message to the Couple",
+    "submit": "Send Confirmation",
+    "success": "Thank you! Your confirmation has been received.",
+    "fireworks": "We can't wait to celebrate with you!"
+  },
+  "guestbook": {
+    "title": "Guestbook",
+    "subtitle": "Leave your wishes and blessings",
+    "name": "Your Name",
+    "message": "Your Message",
+    "submit": "Leave a Message",
+    "success": "Thank you for your beautiful message!"
+  },
+  "gifts": {
+    "title": "Gift Registry",
+    "subtitle": "Your presence is the greatest gift, but if you wish to bless us further",
+    "notice": "This section is for monetary gifts and registry links only — not your wedding entrance QR code.",
+    "cbe": "CBE Account",
+    "telebirr": "Telebirr",
+    "registry": "Gift Registry",
+    "viewRegistry": "View Gift Registry"
+  },
+  "checkIn": {
+    "title": "Entrance Invitation QR",
+    "subtitle": "Show this QR code at the wedding entrance for check-in",
+    "notice": "This QR code is for wedding entrance check-in only. It is separate from the Gift Registry section below.",
+    "searchLabel": "Find your invitation",
+    "searchPlaceholder": "Enter your full name, phone, or email",
+    "findQr": "Get My QR Code",
+    "searching": "Searching...",
+    "searchAgain": "Search again",
+    "notFound": "No invitation found. Please RSVP first or contact the couple.",
+    "lookupError": "Could not look up your invitation. Please try again.",
+    "entranceOnly": "Entrance Check-In",
+    "invitationId": "Invitation ID",
+    "scanAtEntrance": "Present this QR code at the wedding entrance",
+    "notForGifts": "This is not a payment or gift link",
+    "checkedIn": "Checked In",
+    "awaitingCheckIn": "Awaiting Check-In",
+    "openDigitalInvite": "Open full digital invitation",
+    "rsvpQrNote": "Save this QR code — you will need it at the wedding entrance"
+  },
+  "footer": {
+    "contact": "Contact Us",
+    "followUs": "Follow Us",
+    "copyright": "Made with love for our special day"
+  },
+  "invite": {
+    "title": "Your Digital Invitation",
+    "id": "Invitation ID",
+    "scan": "Show this QR code at the entrance",
+    "checkedIn": "Checked In",
+    "pending": "Awaiting Check-In"
+  },
+  "music": {
+    "play": "Play Music",
+    "pause": "Pause Music"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "login": "Admin Login",
+    "password": "Password",
+    "signIn": "Sign In",
+    "guests": "Guests",
+    "rsvps": "RSVPs",
+    "checkIns": "Check-Ins",
+    "guestbook": "Guestbook",
+    "analytics": "Analytics",
+    "addGuest": "Add Guest",
+    "scanQr": "Scan QR Code",
+    "totalGuests": "Total Guests",
+    "confirmed": "Confirmed",
+    "declined": "Declined",
+    "checkedInCount": "Checked In",
+    "logout": "Logout"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

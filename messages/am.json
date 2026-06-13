@@ -1,0 +1,156 @@
+{
+  "nav": {
+    "home": "መነሻ",
+    "story": "የእኛ ታሪክ",
+    "gallery": "ፎቶዎች",
+    "location": "ቦታ",
+    "program": "ፕሮግራም",
+    "rsvp": "መገኘት ማረጋገጫ",
+    "checkIn": "መግቢያ QR",
+    "guestbook": "የእንግዶች መዝገብ",
+    "gifts": "ስጦታ"
+  },
+  "hero": {
+    "together": "ቤተሰቦቻችንን ጋር በመሆን፣",
+    "invite": "የጋብቻ ስነ-ስርዓታችንን ለመከበር በደስታ እንጋብዛችኋለን።",
+    "enterCode": "የግብዣ ኮድ ያስገቡ",
+    "unlock": "ግብዣውን ይክፈቱ",
+    "wrongCode": "የግብዣ ኮድ ትክክል አይደለም። እባክዎ እንደገና ይሞክሩ።"
+  },
+  "story": {
+    "title": "የእኛ ታሪክ",
+    "howWeMet": "እንዴት እንደተገናኘን",
+    "ourJourney": "ጉዞያችን",
+    "bride": "ሙሽtera",
+    "groom": "ሙሽter"
+  },
+  "invitation": {
+    "title": "የግል ግብዣ"
+  },
+  "countdown": {
+    "title": "ለቀናችን እየቆጠርን ነው",
+    "days": "ቀናት",
+    "hours": "ሰዓታት",
+    "minutes": "ደቂቃዎች",
+    "seconds": "ሰከንዶች"
+  },
+  "program": {
+    "title": "የጋብቻ ፕሮግራም"
+  },
+  "gallery": {
+    "title": "ፎቶ ጋለሪ",
+    "engagement": "የEngagement ፎቶዎች",
+    "family": "የቤተሰብ ፎቶዎች",
+    "preWedding": "የPre-Wedding ፎቶዎች",
+    "viewAll": "ሁሉንም ይመልከቱ",
+    "allPhotos": "ከጉዞያችን {count} ፎቶዎች"
+  },
+  "location": {
+    "title": "ቦታ እና አቅጣጫ",
+    "ceremony": "የሥነ-ስርዓት ቦታ",
+    "reception": "የReception ቦታ",
+    "openMaps": "በMap ይክፈቱ",
+    "getDirections": "አቅጣጫ ያግኙ"
+  },
+  "family": {
+    "title": "ቤተሰቦቻችን",
+    "brideFamily": "የሙሽtera ቤተሰብ",
+    "groomFamily": "የሙሽter ቤተሰብ"
+  },
+  "rsvp": {
+    "title": "መገኘት ማረጋገጫ",
+    "subtitle": "እባክዎ መገኘት እንደሚችሉ ያሳውቁን",
+    "name": "ሙሉ ስም",
+    "email": "ኢሜይል",
+    "phone": "ስልክ",
+    "attending": "መገኘት ይችላሉ?",
+    "yes": "በደስታ እቀበላለሁ",
+    "no": "በመከሰኝነት አልችልም",
+    "guestCount": "የእንግዶች ብዛት",
+    "plusOne": "+1 ይመጣሉ?",
+    "dietary": "የምግብ ገደቦች",
+    "message": "ለእኛ መልእክት",
+    "submit": "ማረጋገጫ ላክ",
+    "success": "አመሰግናለን! ማረጋገጫዎ ተቀብለናል።",
+    "fireworks": "ከእናንተ ጋር ለመከበር በጉጉት እንጠብቃለን!"
+  },
+  "guestbook": {
+    "title": "የእንግዶች መዝገብ",
+    "subtitle": "እ 축복ዎችን እና መልእክቶችዎን ይተው",
+    "name": "ስምዎ",
+    "message": "መልእክትዎ",
+    "submit": "መልእክት ይተው",
+    "success": "ለውብ መልእክትዎ አመሰግናለን!"
+  },
+  "gifts": {
+    "title": "የስጦታ መዝገብ",
+    "subtitle": "መገኘትዎ ትልቁ ስጦታ ነው፣ ነገር ግን ተጨማሪ ለመባርክ ከፈለጉ",
+    "notice": "ይህ ክፍል ለገንዘብ ስጦታ እና registry ሊንኮች ብቻ ነው — ለመግቢያ QR ኮድ አይደለም።",
+    "cbe": "CBE መለያ",
+    "telebirr": "Telebirr",
+    "registry": "Gift Registry",
+    "viewRegistry": "Gift Registry ይመልከቱ"
+  },
+  "checkIn": {
+    "title": "መግቢያ ግብዣ QR",
+    "subtitle": "በሥነ-ስርዓቱ መግቢያ ላይ ለመመዝገብ ይህን QR ኮድ ያሳዩ",
+    "notice": "ይህ QR ኮድ ለመግቢያ check-in ብቻ ነው። ከስጦታ registry ክፍል የተለየ ነው።",
+    "searchLabel": "ግብዣዎን ያግኙ",
+    "searchPlaceholder": "ሙሉ ስም፣ ስልክ ወይም ኢሜይል ያስገቡ",
+    "findQr": "QR ኮዴዬን አግኝ",
+    "searching": "በመፈለግ ላይ...",
+    "searchAgain": "እንደገና ፈልግ",
+    "notFound": "ግብዣ አልተገኘም። እባክዎ መጀመሪያ RSVP ያድርጉ።",
+    "lookupError": "ግብዣ ሊገኝ አልቻለም። እንደገና ይሞክሩ።",
+    "entranceOnly": "መግቢያ Check-In",
+    "invitationId": "የግብዣ መለያ",
+    "scanAtEntrance": "በሥነ-ስርዓቱ መግቢያ ይህን QR ኮድ ያሳዩ",
+    "notForGifts": "ይህ የክፍያ ወይም የስጦታ ሊንክ አይደለም",
+    "checkedIn": "ተመዝግበዋል",
+    "awaitingCheckIn": "መመዝገብ በመጠባበቅ ላይ",
+    "openDigitalInvite": "ሙሉ ዲጂታል ግብዣ ይክፈቱ",
+    "rsvpQrNote": "ይህን QR ኮድ ያስቀምጡ — በመግቢያ ያስፈልግዎታል"
+  },
+  "footer": {
+    "contact": "ያግኙን",
+    "followUs": "ይከተሉን",
+    "copyright": "ለልዩ ቀናችን በፍቅር ተሰራ"
+  },
+  "invite": {
+    "title": "ዲጂታል ግብዣዎ",
+    "id": "የግብዣ መለያ",
+    "scan": "በመግቢያው ይህን QR ኮድ ያሳዩ",
+    "checkedIn": "ተመዝግበዋል",
+    "pending": "መመዝገብ በመጠባበቅ ላይ"
+  },
+  "music": {
+    "play": "ሙዚቃ ያጫውቱ",
+    "pause": "ሙዚቃ ያቁሙ"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "login": "Admin Login",
+    "password": "Password",
+    "signIn": "Sign In",
+    "guests": "Guests",
+    "rsvps": "RSVPs",
+    "checkIns": "Check-Ins",
+    "guestbook": "Guestbook",
+    "analytics": "Analytics",
+    "addGuest": "Add Guest",
+    "scanQr": "Scan QR Code",
+    "totalGuests": "Total Guests",
+    "confirmed": "Confirmed",
+    "declined": "Declined",
+    "checkedInCount": "Checked In",
+    "logout": "Logout"
+  },
+  "common": {
+    "loading": "በመጫን ላይ...",
+    "error": "አንድ ነገር ተሳስቷል",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

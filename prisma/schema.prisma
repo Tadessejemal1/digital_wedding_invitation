@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Couple {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  groomName          String   @map("groom_name")
+  brideName          String   @map("bride_name")
+  groomBio           String?  @map("groom_bio")
+  brideBio           String?  @map("bride_bio")
+  story              String?
+  howTheyMet         String?  @map("how_they_met")
+  journey            String?
+  invitationMessage  String?  @map("invitation_message")
+  weddingDate        DateTime @map("wedding_date")
+  venueName          String   @map("venue_name")
+  venueAddress       String   @map("venue_address")
+  receptionName      String?  @map("reception_name")
+  receptionAddress   String?  @map("reception_address")
+  mapLink            String?  @map("map_link")
+  receptionMapLink   String?  @map("reception_map_link")
+  coverImage         String?  @map("cover_image")
+  invitePassword     String?  @map("invite_password")
+  groomFamily        String?  @map("groom_family")
+  brideFamily        String?  @map("bride_family")
+  cbeAccount         String?  @map("cbe_account")
+  telebirr           String?
+  giftRegistry       String?  @map("gift_registry")
+  contactPhone       String?  @map("contact_phone")
+  contactEmail       String?  @map("contact_email")
+  socialInstagram    String?  @map("social_instagram")
+  socialFacebook     String?  @map("social_facebook")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  gallery Gallery[]
+  program Program[]
+  guests  Guest[]
+
+  @@map("couples")
+}
+
+model Gallery {
+  id       String @id @default(cuid())
+  coupleId String @map("couple_id")
+  imageUrl String @map("image_url")
+  caption  String?
+  category String @default("engagement")
+  orderNo  Int    @default(0) @map("order_no")
+
+  couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+
+  @@map("gallery")
+}
+
+model Program {
+  id          String @id @default(cuid())
+  coupleId    String @map("couple_id")
+  title       String
+  startTime   String @map("start_time")
+  description String?
+
+  couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+
+  @@map("program")
+}
+
+enum GuestStatus {
+  PENDING
+  CHECKED_IN
+  DECLINED
+}
+
+model Guest {
+  id          String      @id @default(cuid())
+  coupleId    String      @map("couple_id")
+  name        String
+  phone       String?
+  email       String?
+  qrCode      String      @unique @map("qr_code")
+  status      GuestStatus @default(PENDING)
+  checkedInAt DateTime?   @map("checked_in_at")
+
+  couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  rsvp   Rsvp?
+
+  @@map("guests")
+}
+
+model Rsvp {
+  id           String   @id @default(cuid())
+  guestId      String   @unique @map("guest_id")
+  attendance   Boolean
+  guestCount   Int      @default(1) @map("guest_count")
+  plusOne      Boolean  @default(false) @map("plus_one")
+  dietaryNotes String?  @map("dietary_notes")
+  message      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("rsvp")
+}
+
+model Guestbook {
+  id        String   @id @default(cuid())
+  guestName String   @map("guest_name")
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("guestbook")
+}

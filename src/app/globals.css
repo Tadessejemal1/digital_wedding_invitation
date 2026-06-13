@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-gold: #c9a227;
+  --color-gold-light: #e8d48b;
+  --color-ivory: #f8f4ec;
+  --color-wine: #7a1f1f;
+  --color-wine-light: #9a3535;
+  --color-text: #2d2d2d;
+  --color-background: #fffdf8;
+  --font-display: var(--font-playfair);
+  --font-serif: var(--font-cormorant);
+  --font-body: var(--font-poppins);
+  --font-amharic: var(--font-noto-ethiopic);
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+.font-amharic {
+  font-family: var(--font-amharic), var(--font-body), sans-serif;
+}
+
+.section-padding {
+  @apply px-4 py-20 md:px-8 lg:px-16 xl:px-24;
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #c9a227 0%, #e8d48b 50%, #c9a227 100%);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #c9a227, #e8d48b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.decorative-line {
+  @apply mx-auto h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent;
+}
+
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+  @apply flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #c9a227, #fff, #c9a227);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+.swiper-pagination-bullet-active {
+  background: #c9a227 !important;
+}
+
+.fireworks-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}

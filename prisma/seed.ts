@@ -23,6 +23,7 @@ async function main() {
       receptionAddress: "Addis Ababa, Ethiopia",
       mapLink: HOLY_TRINITY_MAP_LINK,
       receptionMapLink: PARENTS_HOME_MAP_LINK,
+      invitePassword: null,
     },
     create: {
       slug: coupleInfo.slug,
@@ -42,7 +43,7 @@ async function main() {
       mapLink: HOLY_TRINITY_MAP_LINK,
       receptionMapLink: PARENTS_HOME_MAP_LINK,
       coverImage: weddingImages.hero,
-      invitePassword: "love2026",
+      invitePassword: null,
       groomFamily: "Mr. & Mrs. Tesfaye Kebede\nBrothers: Dawit & Yonas",
       brideFamily: "Mr. & Mrs. Almaz Desta\nSisters: Selam & Bethlehem",
       cbeAccount: "1000123456789",

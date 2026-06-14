@@ -73,7 +73,10 @@
     "message": "Message to the Couple",
     "submit": "Send Confirmation",
     "success": "Thank you! Your confirmation has been received.",
+    "successDeclined": "Thank you for letting us know. We will miss you!",
     "fireworks": "We can't wait to celebrate with you!",
+    "qrPreparing": "Your entrance QR code will appear in a moment...",
+    "closePopup": "Close",
     "error": "Could not submit your confirmation. Please try again."
   },
   "guestbook": {

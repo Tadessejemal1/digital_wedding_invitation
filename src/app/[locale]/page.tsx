@@ -73,14 +73,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <WeddingPageShell
-      requirePassword={!!data.invitePassword}
+      requirePassword={false}
       hero={
         <HeroSection
           groomName={data.groomName}
           brideName={data.brideName}
           weddingDate={new Date(data.weddingDate)}
           coverImage={data.coverImage}
-          requirePassword={!!data.invitePassword}
+          requirePassword={false}
         />
       }
     >

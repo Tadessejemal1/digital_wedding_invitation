@@ -8,7 +8,7 @@ import { GallerySection } from "@/components/wedding/GallerySection";
 import { LocationSection } from "@/components/wedding/LocationSection";
 import { FamilySection } from "@/components/wedding/FamilySection";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
-import { InvitationQrSection } from "@/components/wedding/InvitationQrSection";
+// import { InvitationQrSection } from "@/components/wedding/InvitationQrSection";
 import { GuestbookSection } from "@/components/wedding/GuestbookSection";
 // import { GiftsSection } from "@/components/wedding/GiftsSection";
 import { Footer } from "@/components/wedding/Footer";
@@ -49,6 +49,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   data.venueAddress = "In front of Jambo Building, Addisu Gebeya, Addis Ababa, Ethiopia";
   data.howTheyMet = howTheyMetStory;
   data.journey = journeyStory;
+  data.contactPhone = "+251715664630 / +251985810221";
 
   if (locale === "am") {
     const { amharicData } = await import("@/lib/amharic-data");
@@ -120,7 +121,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       />
       <FamilySection brideFamily={data.brideFamily} groomFamily={data.groomFamily} />
       <RsvpSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
-      <InvitationQrSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
+      {/* <InvitationQrSection coupleId={data.id} slug={data.slug || coupleInfo.slug} /> */}
       {/* <GiftsSection
         cbeAccount={data.cbeAccount}
         telebirr={data.telebirr}
@@ -131,6 +132,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         groomName={data.groomName}
         brideName={data.brideName}
         contactPhone={data.contactPhone}
+        contactPhones={["+251715664630", "+251985810221"]}
         contactEmail={data.contactEmail}
       />
     </WeddingPageShell>

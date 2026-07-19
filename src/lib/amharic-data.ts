@@ -36,7 +36,6 @@ export const amharicData = {
     "Love and tenderness": "ፍቅር እና ርህራሄ",
     "Bride in bloom": "ሙሽሪት በአበባ",
     "With her bouquet": "ከአበባ ጥቅል ጋር",
-    "Surrounded by love": "በፍቅር ተከብበው",
     "In traditional attire": "በባህላዊ ልብስ",
     "Our heritage together": "ባህላችን አብረን",
     "Walking into forever": "ወደ ዘላለም",

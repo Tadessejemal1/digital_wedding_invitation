@@ -49,7 +49,7 @@ async function main() {
       cbeAccount: "1000123456789",
       telebirr: "0911-234-567",
       giftRegistry: "https://example.com/registry",
-      contactPhone: "+251 911 234 567",
+      contactPhone: "+251715664630 / +251985810221",
       contactEmail: "tadesse.hana@wedding.com",
       socialInstagram: "https://instagram.com",
       socialFacebook: "https://facebook.com",

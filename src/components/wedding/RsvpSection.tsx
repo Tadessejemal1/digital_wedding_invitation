@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Fireworks } from "@/components/shared/Fireworks";
-import { GuestQrCard } from "@/components/invite/GuestQrCard";
+// import { GuestQrCard } from "@/components/invite/GuestQrCard";
 import { emailRsvpNotification } from "@/lib/web3forms-client";
 import { X } from "lucide-react";
 
@@ -39,7 +39,7 @@ const initialForm = {
 
 export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
   const t = useTranslations("rsvp");
-  const tCheckIn = useTranslations("checkIn");
+  // const tCheckIn = useTranslations("checkIn");
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -190,6 +190,7 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
                 )}
               </div>
 
+              {/* QR code temporarily commented out
               <div className="mt-4">
                 {!showQr ? (
                   <p className="py-10 text-center text-sm text-gray-500">{t("qrPreparing")}</p>
@@ -207,6 +208,7 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
                   </motion.div>
                 )}
               </div>
+              */}
 
               <div className="mt-5 text-center">
                 <Button type="button" variant="outline" onClick={closePopup}>

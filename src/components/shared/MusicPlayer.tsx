@@ -11,11 +11,14 @@ import {
   isMusicPausedByUser,
 } from "@/lib/invite-unlock";
 
+const MUSIC_SRC = "/images/weeding.MP4";
+
 export function MusicPlayer() {
   const t = useTranslations("music");
   const { unlocked, requirePassword, registerPlayWeddingMusic } = useInviteUnlock();
   const [playing, setPlaying] = useState(false);
   const mediaRef = useRef<HTMLVideoElement>(null);
+  const startedRef = useRef(false);
   const showControls = !requirePassword || unlocked;
 
   const playMedia = useCallback(async () => {
@@ -23,19 +26,22 @@ export function MusicPlayer() {
     if (!media) return false;
 
     try {
+      media.volume = 1;
       media.muted = false;
       await media.play();
       setPlaying(true);
       persistMusicPausedByUser(false);
+      startedRef.current = true;
       return true;
     } catch {
-      // Browsers often block unmuted autoplay — try muted, then unmute
       try {
+        // Some browsers only allow muted autoplay first
         media.muted = true;
         await media.play();
         media.muted = false;
         setPlaying(true);
         persistMusicPausedByUser(false);
+        startedRef.current = true;
         return true;
       } catch {
         setPlaying(false);
@@ -58,44 +64,51 @@ export function MusicPlayer() {
     return () => registerPlayWeddingMusic(null);
   }, [registerPlayWeddingMusic, playMedia]);
 
-  // Auto-start when the invite page opens
+  // Start music as soon as the invite link is opened
   useEffect(() => {
     if (!shouldAutoPlayMusic(requirePassword, unlocked)) return;
 
     let cancelled = false;
+    const media = mediaRef.current;
+
     const tryPlay = () => {
-      if (cancelled || isMusicPausedByUser()) return;
+      if (cancelled || isMusicPausedByUser() || startedRef.current) return;
       void playMedia();
     };
 
-    // Immediate + short delayed retries (media may not be ready yet)
     tryPlay();
-    const t1 = window.setTimeout(tryPlay, 300);
-    const t2 = window.setTimeout(tryPlay, 1000);
+    const timers = [200, 500, 1200, 2500].map((ms) => window.setTimeout(tryPlay, ms));
 
-    // If autoplay is blocked, start on first tap/click/keydown
+    const onReady = () => tryPlay();
+    media?.addEventListener("loadeddata", onReady);
+    media?.addEventListener("canplay", onReady);
+
+    // Browser autoplay policy: start on first interaction with the page
     const startOnGesture = () => {
       if (cancelled || isMusicPausedByUser()) return;
       void playMedia().then((ok) => {
-        if (ok) {
-          window.removeEventListener("pointerdown", startOnGesture);
-          window.removeEventListener("keydown", startOnGesture);
-          window.removeEventListener("touchstart", startOnGesture);
-        }
+        if (ok) cleanupGestures();
       });
     };
 
-    window.addEventListener("pointerdown", startOnGesture, { once: false });
-    window.addEventListener("keydown", startOnGesture, { once: false });
-    window.addEventListener("touchstart", startOnGesture, { once: false });
+    const cleanupGestures = () => {
+      window.removeEventListener("pointerdown", startOnGesture);
+      window.removeEventListener("click", startOnGesture);
+      window.removeEventListener("touchstart", startOnGesture);
+      window.removeEventListener("keydown", startOnGesture);
+    };
+
+    window.addEventListener("pointerdown", startOnGesture);
+    window.addEventListener("click", startOnGesture);
+    window.addEventListener("touchstart", startOnGesture, { passive: true });
+    window.addEventListener("keydown", startOnGesture);
 
     return () => {
       cancelled = true;
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener("pointerdown", startOnGesture);
-      window.removeEventListener("keydown", startOnGesture);
-      window.removeEventListener("touchstart", startOnGesture);
+      timers.forEach(window.clearTimeout);
+      media?.removeEventListener("loadeddata", onReady);
+      media?.removeEventListener("canplay", onReady);
+      cleanupGestures();
     };
   }, [unlocked, requirePassword, playMedia]);
 
@@ -115,8 +128,8 @@ export function MusicPlayer() {
         autoPlay
         playsInline
         preload="auto"
-        className="hidden"
-        src="/images/wedding.MP4"
+        className="pointer-events-none fixed h-px w-px opacity-0"
+        src={MUSIC_SRC}
       />
       {showControls && (
         <motion.button

@@ -9,6 +9,8 @@ import {
   persistMusicPausedByUser,
   shouldAutoPlayMusic,
   isMusicPausedByUser,
+  hasEnteredWithMusic,
+  persistEnteredWithMusic,
 } from "@/lib/invite-unlock";
 
 const MUSIC_SRC = "/images/weeding.MP4";
@@ -18,58 +20,32 @@ export function MusicPlayer() {
   const { unlocked, requirePassword, registerPlayWeddingMusic } = useInviteUnlock();
   const [playing, setPlaying] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [needsTap, setNeedsTap] = useState(false);
+  const [ready, setReady] = useState(false);
   const mediaRef = useRef<HTMLVideoElement>(null);
   const showControls = !requirePassword || unlocked;
 
-  const playMedia = useCallback(async (preferMutedFallback = true) => {
+  const playWithSound = useCallback(async () => {
     const media = mediaRef.current;
-    if (!media || isMusicPausedByUser()) return false;
-
-    try {
-      media.muted = false;
-      media.volume = 1;
-      await media.play();
-      setPlaying(true);
-      setSoundOn(true);
-      persistMusicPausedByUser(false);
-      return true;
-    } catch {
-      if (!preferMutedFallback) {
-        setPlaying(false);
-        return false;
-      }
-
-      try {
-        // Browsers allow muted autoplay immediately — unmute on first gesture
-        media.muted = true;
-        await media.play();
-        setPlaying(true);
-        setSoundOn(false);
-        return true;
-      } catch {
-        setPlaying(false);
-        return false;
-      }
-    }
-  }, []);
-
-  const unmuteAndPlay = useCallback(async () => {
-    const media = mediaRef.current;
-    if (!media || isMusicPausedByUser()) return false;
+    if (!media) return false;
 
     media.muted = false;
     media.volume = 1;
 
     try {
-      if (media.paused) await media.play();
+      await media.play();
       setPlaying(true);
       setSoundOn(true);
       persistMusicPausedByUser(false);
+      persistEnteredWithMusic();
+      setNeedsTap(false);
       return true;
     } catch {
-      return playMedia(false);
+      setPlaying(false);
+      setSoundOn(false);
+      return false;
     }
-  }, [playMedia]);
+  }, []);
 
   const pauseMedia = useCallback(() => {
     if (!mediaRef.current) return;
@@ -81,62 +57,95 @@ export function MusicPlayer() {
 
   useEffect(() => {
     registerPlayWeddingMusic(() => {
-      void unmuteAndPlay();
+      void playWithSound();
     });
     return () => registerPlayWeddingMusic(null);
-  }, [registerPlayWeddingMusic, unmuteAndPlay]);
+  }, [registerPlayWeddingMusic, playWithSound]);
 
-  // Start playback immediately when the invite opens (no delay)
+  // Try to start with sound immediately; if blocked, show tap-to-open overlay
   useEffect(() => {
-    if (!shouldAutoPlayMusic(requirePassword, unlocked)) return;
+    if (!shouldAutoPlayMusic(requirePassword, unlocked)) {
+      setReady(true);
+      return;
+    }
 
     let cancelled = false;
     const media = mediaRef.current;
+    let attempted = false;
 
-    const tryImmediate = () => {
-      if (cancelled || isMusicPausedByUser()) return;
-      void playMedia(true);
+    const attempt = async () => {
+      if (cancelled || attempted || isMusicPausedByUser()) {
+        setReady(true);
+        return;
+      }
+      attempted = true;
+
+      const ok = await playWithSound();
+      if (cancelled) return;
+
+      if (!ok) {
+        setNeedsTap(true);
+        try {
+          if (media) {
+            media.muted = true;
+            await media.play();
+            if (!cancelled) {
+              setPlaying(true);
+              setSoundOn(false);
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!cancelled) setReady(true);
     };
 
-    tryImmediate();
-
-    const onReady = () => tryImmediate();
-    media?.addEventListener("loadeddata", onReady);
-    media?.addEventListener("canplay", onReady);
-
-    const unlockSound = () => {
-      if (cancelled || isMusicPausedByUser()) return;
-      void unmuteAndPlay().then((ok) => {
-        if (ok) cleanupGestures();
-      });
+    const onCanPlay = () => {
+      void attempt();
     };
 
-    const cleanupGestures = () => {
-      window.removeEventListener("pointerdown", unlockSound, true);
-      window.removeEventListener("touchstart", unlockSound, true);
-      window.removeEventListener("keydown", unlockSound, true);
-      window.removeEventListener("scroll", unlockSound, true);
-    };
+    media?.addEventListener("canplay", onCanPlay);
+    media?.addEventListener("loadeddata", onCanPlay);
 
-    // Capture phase so first tap/scroll unlocks sound instantly
-    window.addEventListener("pointerdown", unlockSound, true);
-    window.addEventListener("touchstart", unlockSound, { capture: true, passive: true });
-    window.addEventListener("keydown", unlockSound, true);
-    window.addEventListener("scroll", unlockSound, true);
+    if (media && media.readyState >= 2) {
+      void attempt();
+    } else {
+      // Force load and retry shortly
+      try {
+        media?.load();
+      } catch {
+        // ignore
+      }
+    }
+
+    const timer = window.setTimeout(() => void attempt(), 150);
 
     return () => {
       cancelled = true;
-      media?.removeEventListener("loadeddata", onReady);
-      media?.removeEventListener("canplay", onReady);
-      cleanupGestures();
+      window.clearTimeout(timer);
+      media?.removeEventListener("canplay", onCanPlay);
+      media?.removeEventListener("loadeddata", onCanPlay);
     };
-  }, [unlocked, requirePassword, playMedia, unmuteAndPlay]);
+  }, [unlocked, requirePassword, playWithSound]);
+
+  // If user already opened this session, keep trying to resume with sound
+  useEffect(() => {
+    if (!ready || !hasEnteredWithMusic() || isMusicPausedByUser()) return;
+    void playWithSound();
+  }, [ready, playWithSound]);
+
+  const handleOpenInvite = async () => {
+    const ok = await playWithSound();
+    if (ok) setNeedsTap(false);
+  };
 
   const toggle = () => {
     if (playing && soundOn) {
       pauseMedia();
     } else {
-      void unmuteAndPlay();
+      void playWithSound();
     }
   };
 
@@ -145,16 +154,43 @@ export function MusicPlayer() {
       <video
         ref={mediaRef}
         loop
-        autoPlay
-        muted
         playsInline
         preload="auto"
         className="pointer-events-none fixed h-px w-px opacity-0"
         src={MUSIC_SRC}
       />
-      {showControls && (
+
+      <AnimatePresence>
+        {needsTap && showControls && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={handleOpenInvite}
+            className="fixed inset-0 z-[200] flex cursor-pointer flex-col items-center justify-center bg-wine/95 px-6 text-center text-white"
+            aria-label={t("openInvite")}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="max-w-sm"
+            >
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-gold/40 bg-white/10">
+                <Music className="h-7 w-7 text-gold-light" />
+              </div>
+              <p className="font-display text-3xl text-gold-light sm:text-4xl">{t("openInvite")}</p>
+              <p className="font-serif mt-4 text-base italic text-white/80 sm:text-lg">{t("openInviteHint")}</p>
+            </motion.div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {showControls && !needsTap && (
         <motion.button
-          initial={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={toggle}
           className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white sm:bottom-6 sm:right-6 sm:h-12 sm:w-12"

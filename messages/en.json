@@ -136,7 +136,9 @@
   },
   "music": {
     "play": "Play Music",
-    "pause": "Pause Music"
+    "pause": "Pause Music",
+    "openInvite": "Open Invitation",
+    "openInviteHint": "Tap anywhere to begin."
   },
   "admin": {
     "title": "Admin Dashboard",

@@ -37,3 +37,15 @@ export function shouldAutoPlayMusic(requirePassword: boolean, unlocked: boolean)
   if (requirePassword && !unlocked) return false;
   return !isMusicPausedByUser();
 }
+
+const MUSIC_ENTERED_KEY = `wedding-music-entered:${coupleInfo.slug}`;
+
+export function hasEnteredWithMusic(): boolean {
+  if (typeof window === "undefined") return false;
+  return sessionStorage.getItem(MUSIC_ENTERED_KEY) === "true";
+}
+
+export function persistEnteredWithMusic(): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(MUSIC_ENTERED_KEY, "true");
+}

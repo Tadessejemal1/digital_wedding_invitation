@@ -136,7 +136,9 @@
   },
   "music": {
     "play": "ሙዚቃ ያጫውቱ",
-    "pause": "ሙዚቃ ያቁሙ"
+    "pause": "ሙዚቃ ያቁሙ",
+    "openInvite": "ግብዣውን ይክፈቱ",
+    "openInviteHint": "ለመጀመር በማንኛውም ቦታ ይንኩ።"
   },
   "admin": {
     "title": "Admin Dashboard",

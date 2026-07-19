@@ -77,7 +77,7 @@ export function HeroSection({
           quality={90}
           className="object-contain object-center brightness-105"
           sizes="100vw"
-          style={{ transform: "scale(0.82)" }}
+          style={{ transform: "scale(0.90)" }}
         />
         {/* Soft bottom fade for text readability */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />

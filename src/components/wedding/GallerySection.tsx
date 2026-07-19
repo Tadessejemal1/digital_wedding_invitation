@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectCoverflow, FreeMode } from "swiper/modules";
 import { useTranslations } from "next-intl";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -11,8 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
-
-const PAGE_SIZE = 10;
+import "swiper/css/free-mode";
 
 interface GalleryItem {
   id: string;
@@ -37,50 +36,41 @@ function shuffleItems<T>(list: T[]): T[] {
 export function GallerySection({ items }: GallerySectionProps) {
   const t = useTranslations("gallery");
   const [lightbox, setLightbox] = useState<GalleryItem | null>(null);
-  const [page, setPage] = useState(0);
   const [shuffled, setShuffled] = useState<GalleryItem[]>(items);
 
   useEffect(() => {
     setShuffled(shuffleItems(items));
-    setPage(0);
   }, [items]);
-
-  const totalPages = Math.max(1, Math.ceil(shuffled.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const pageItems = shuffled.slice(
-    currentPage * PAGE_SIZE,
-    currentPage * PAGE_SIZE + PAGE_SIZE
-  );
-
-  const goToPage = (nextPage: number) => {
-    setPage(Math.max(0, Math.min(nextPage, totalPages - 1)));
-  };
 
   if (items.length === 0) return null;
 
   return (
     <section id="gallery" className="section-padding bg-ivory">
-      <SectionHeading title={t("title")} subtitle={t("allPhotos", { count: items.length })} />
+      <SectionHeading title={t("title")} />
 
-      <div className="relative mx-auto max-w-5xl px-12">
+      <div className="relative mx-auto max-w-6xl px-12">
         <Swiper
-          key={`gallery-carousel-${currentPage}`}
-          modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
+          modules={[Navigation, Pagination, Autoplay, EffectCoverflow, FreeMode]}
           effect="coverflow"
           grabCursor
+          freeMode={{ enabled: true, sticky: false }}
           centeredSlides
-          slidesPerView={1}
-          coverflowEffect={{ rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: false }}
-          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          slidesPerView={1.2}
+          spaceBetween={16}
+          coverflowEffect={{ rotate: 0, stretch: 0, depth: 80, modifier: 1.5, slideShadows: false }}
+          autoplay={{ delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true }}
           pagination={{ clickable: true }}
           navigation={{
             prevEl: ".swiper-button-prev-custom",
             nextEl: ".swiper-button-next-custom",
           }}
-          breakpoints={{ 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }}
+          breakpoints={{
+            640: { slidesPerView: 2.2 },
+            1024: { slidesPerView: 3.2 },
+          }}
           className="pb-12"
         >
-          {pageItems.map((item) => (
+          {shuffled.map((item) => (
             <SwiperSlide key={item.id}>
               <button
                 type="button"
@@ -93,7 +83,7 @@ export function GallerySection({ items }: GallerySectionProps) {
                   fill
                   loading="lazy"
                   className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) 80vw, 33vw"
                 />
                 {item.caption && (
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 p-4 text-white opacity-0 transition-opacity group-hover:opacity-100">
@@ -119,69 +109,6 @@ export function GallerySection({ items }: GallerySectionProps) {
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
-
-      <div className="mx-auto mt-12 grid max-w-6xl grid-cols-2 justify-items-center gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {pageItems.map((item) => (
-          <button
-            type="button"
-            key={`grid-${item.id}`}
-            onClick={() => setLightbox(item)}
-            className="group relative aspect-square w-full max-w-[220px] overflow-hidden rounded-lg shadow-md"
-          >
-            <Image
-              src={item.imageUrl}
-              alt={item.caption || "Wedding photo"}
-              fill
-              loading="lazy"
-              className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, 20vw"
-            />
-          </button>
-        ))}
-      </div>
-
-      {totalPages > 1 && (
-        <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 0}
-            className="rounded-full border border-gold/30 bg-white px-4 py-2 text-sm text-wine transition-colors hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {t("previous")}
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              type="button"
-              key={`page-${i}`}
-              onClick={() => goToPage(i)}
-              className={`min-w-10 rounded-full px-3 py-2 text-sm transition-colors ${
-                i === currentPage
-                  ? "bg-wine text-white"
-                  : "border border-gold/30 bg-white text-wine hover:bg-gold/10"
-              }`}
-              aria-label={t("page", { page: i + 1 })}
-              aria-current={i === currentPage ? "page" : undefined}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage >= totalPages - 1}
-            className="rounded-full border border-gold/30 bg-white px-4 py-2 text-sm text-wine transition-colors hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {t("next")}
-          </button>
-
-          <p className="w-full text-center text-sm text-gray-500">
-            {t("pageOf", { page: currentPage + 1, total: totalPages })}
-          </p>
-        </div>
-      )}
 
       {lightbox && (
         <div

@@ -66,7 +66,7 @@ export function HeroSection({
           aria-hidden
           className="object-cover object-center brightness-110"
           sizes="100vw"
-          style={{ filter: "blur(28px)", transform: "scale(1.5)" }}
+          style={{ filter: "blur(28px)", transform: "scale(1.2)" }}
         />
         {/* Main photo — clear zoom out so more of the couple is visible */}
         <Image

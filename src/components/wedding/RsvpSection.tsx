@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionHeading } from "@/components/shared/SectionHeading";
@@ -45,25 +45,11 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
   const [error, setError] = useState("");
   const [showFireworks, setShowFireworks] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
-  const [showQr, setShowQr] = useState(false);
   const [submittedAttending, setSubmittedAttending] = useState(true);
-  const [submittedName, setSubmittedName] = useState("");
   const [rsvpResult, setRsvpResult] = useState<RsvpResult | null>(null);
-
-  useEffect(() => {
-    if (!popupOpen) {
-      setShowQr(false);
-      return;
-    }
-
-    // Show QR promptly so guests can save it without a long wait
-    const timer = window.setTimeout(() => setShowQr(true), 400);
-    return () => window.clearTimeout(timer);
-  }, [popupOpen]);
 
   const closePopup = () => {
     setPopupOpen(false);
-    setShowQr(false);
     setRsvpResult(null);
     setShowFireworks(false);
     setForm(initialForm);
@@ -81,7 +67,6 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
       });
       const data = await res.json();
       if (res.ok) {
-        setSubmittedName(form.name);
         setSubmittedAttending(form.attending);
         setRsvpResult(data);
         setPopupOpen(true);

@@ -68,19 +68,19 @@ export function HeroSection({
           sizes="100vw"
           style={{ filter: "blur(28px)", transform: "scale(1.2)" }}
         />
-        {/* Main photo — clear zoom out so more of the couple is visible */}
+        {/* Main photo — wider scale, slightly raised above invite text */}
         <Image
           src={coverImage || "/images/0K8A0230.JPG"}
           alt={`${groomName} & ${brideName}`}
           fill
           priority
           quality={90}
-          className="object-contain object-center brightness-105"
+          className="object-contain object-[center_18%] brightness-105"
           sizes="100vw"
-          style={{ transform: "scale(0.90)" }}
+          style={{ transform: "scale(1.28) translateY(-3%)" }}
         />
         {/* Soft bottom fade for text readability */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
       </div>
 
       {isLocked && (

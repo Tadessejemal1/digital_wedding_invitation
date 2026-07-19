@@ -50,17 +50,37 @@ export function HeroSection({
   };
 
   return (
-    <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      <div className="absolute inset-0">
+    <section
+      id="home"
+      className={`relative flex min-h-screen flex-col items-center overflow-hidden pb-8 ${
+        isLocked ? "justify-center" : "justify-end"
+      }`}
+    >
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Matching soft background (fills edges when zoomed out) */}
         <Image
-          src={"/images/M13.jpeg"}
-          alt="Wedding"
+          src={coverImage || "/images/0K8A0230.JPG"}
+          alt=""
           fill
           priority
-          className="object-cover"
+          aria-hidden
+          className="object-cover object-center brightness-110"
           sizes="100vw"
+          style={{ filter: "blur(28px)", transform: "scale(1.5)" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        {/* Main photo — clear zoom out so more of the couple is visible */}
+        <Image
+          src={coverImage || "/images/0K8A0230.JPG"}
+          alt={`${groomName} & ${brideName}`}
+          fill
+          priority
+          quality={90}
+          className="object-contain object-center brightness-105"
+          sizes="100vw"
+          style={{ transform: "scale(0.82)" }}
+        />
+        {/* Soft bottom fade for text readability */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
       </div>
 
       {isLocked && (
@@ -98,12 +118,12 @@ export function HeroSection({
           </form>
         </motion.div>
       ) : (
-        <div className="relative z-10 px-4 text-center text-white">
+        <div className="relative z-10 mb-16 w-full px-4 text-center text-white md:mb-20">
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-serif mb-4 text-lg italic md:text-xl"
+            className="font-serif mb-3 text-lg italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] md:text-xl"
           >
             {t("together")}
           </motion.p>
@@ -112,10 +132,10 @@ export function HeroSection({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="font-display mb-6 text-5xl font-light tracking-wider md:text-7xl lg:text-8xl"
+            className="font-display mb-4 text-5xl font-light tracking-wider drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] md:text-7xl lg:text-8xl"
           >
             <span className="shimmer-text">{groomName}</span>
-            <span className="mx-4 text-gold-light">&</span>
+            <span className="mx-4 text-gold-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">&</span>
             <span className="shimmer-text">{brideName}</span>
           </motion.h1>
 
@@ -123,7 +143,7 @@ export function HeroSection({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.9 }}
-            className="font-serif mx-auto mb-8 max-w-lg text-lg italic md:text-xl"
+            className="font-serif mx-auto mb-5 max-w-lg text-lg italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] md:text-xl"
           >
             {t("invite")}
           </motion.p>
@@ -132,7 +152,7 @@ export function HeroSection({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
-            className="font-display text-2xl tracking-wide text-gold-light md:text-3xl"
+            className="font-display text-2xl tracking-wide text-gold-light drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] md:text-3xl"
           >
             {formatWeddingDate(weddingDate, locale)}
           </motion.div>
@@ -145,7 +165,7 @@ export function HeroSection({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-white/80"
+          className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 text-white/90 drop-shadow-lg"
           aria-label="Scroll down"
         >
           <ChevronDown className="h-8 w-8 animate-bounce" />

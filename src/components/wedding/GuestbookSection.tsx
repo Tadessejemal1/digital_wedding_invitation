@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "@/lib/date-utils";
+import { emailGuestbookNotification } from "@/lib/web3forms-client";
 
 interface GuestbookEntry {
   id: string;
@@ -41,10 +42,12 @@ export function GuestbookSection() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
+        const payload = { guestName: form.guestName, message: form.message };
         setSuccess(true);
         setForm({ guestName: "", message: "" });
         fetchEntries();
         setTimeout(() => setSuccess(false), 3000);
+        void emailGuestbookNotification(payload);
       }
     } finally {
       setLoading(false);

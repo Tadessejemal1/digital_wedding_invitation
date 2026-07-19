@@ -43,11 +43,15 @@
     "family": "Family Photos",
     "preWedding": "Pre-Wedding Photos",
     "viewAll": "View All",
-    "allPhotos": "{count} photos from our journey"
+    "allPhotos": "{count} photos from our journey",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page}",
+    "pageOf": "Page {page} of {total}"
   },
   "location": {
     "title": "Venue & Directions",
-    "ceremony": "Holy Trinity Cathedral",
+    "ceremony": "Ceremony Venue",
     "parentsHome": "Tadesse's Parents Home",
     "reception": "Reception Location",
     "openMaps": "Open in Maps",
@@ -119,7 +123,7 @@
   "footer": {
     "contact": "Contact Us",
     "followUs": "Follow Us",
-    "copyright": "Made with love for our special day"
+    "copyright": "Made by Entro Ethiopia Software Company"
   },
   "invite": {
     "title": "Your Digital Invitation",

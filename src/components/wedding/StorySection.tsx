@@ -17,11 +17,44 @@ interface StoryProps {
   story?: string | null;
 }
 
+function CouplePortrait({
+  image,
+  name,
+  role,
+  bio,
+}: {
+  image: string;
+  name: string;
+  role: string;
+  bio?: string | null;
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-gold/20 bg-white shadow-xl">
+      <div className="relative aspect-[3/4] w-full bg-[#f3efe6]">
+        <Image
+          src={image}
+          alt={name}
+          fill
+          quality={95}
+          priority
+          className="object-contain object-center"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      </div>
+      <div className="bg-gradient-to-b from-wine to-wine/95 px-6 py-5 text-center text-white">
+        <p className="text-sm uppercase tracking-widest text-gold-light">{role}</p>
+        <h3 className="font-display mt-1 text-3xl">{name}</h3>
+        {bio && <p className="mt-2 font-serif text-sm italic text-white/90">{bio}</p>}
+      </div>
+    </div>
+  );
+}
+
 export function StorySection({
   groomName,
   brideName,
-  brideImage = "/images/M9.jpeg",
-  groomImage = "/images/M11.jpeg",
+  brideImage = "/images/0K8A0023.JPG",
+  groomImage = "/images/0K8A0478.JPG",
   groomBio,
   brideBio,
   howTheyMet,
@@ -34,41 +67,23 @@ export function StorySection({
     <section id="story" className="section-padding bg-ivory">
       <SectionHeading title={t("title")} />
 
-      <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-2">
+      <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2 md:gap-10">
         <ScrollReveal>
-          <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
-            <Image
-              src={brideImage}
-              alt={brideName}
-              fill
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-wine/60 to-transparent" />
-            <div className="absolute bottom-0 p-6 text-center text-white">
-              <p className="text-sm uppercase tracking-widest text-gold-light">{t("bride")}</p>
-              <h3 className="font-display text-3xl">{brideName}</h3>
-              {brideBio && <p className="mt-2 font-serif italic opacity-90">{brideBio}</p>}
-            </div>
-          </div>
+          <CouplePortrait
+            image={brideImage}
+            name={brideName}
+            role={t("bride")}
+            bio={brideBio}
+          />
         </ScrollReveal>
 
         <ScrollReveal delay={0.2}>
-          <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
-            <Image
-              src={groomImage}
-              alt={groomName}
-              fill
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-wine/60 to-transparent" />
-            <div className="absolute bottom-0 p-6 text-center text-white">
-              <p className="text-sm uppercase tracking-widest text-gold-light">{t("groom")}</p>
-              <h3 className="font-display text-3xl">{groomName}</h3>
-              {groomBio && <p className="mt-2 font-serif italic opacity-90">{groomBio}</p>}
-            </div>
-          </div>
+          <CouplePortrait
+            image={groomImage}
+            name={groomName}
+            role={t("groom")}
+            bio={groomBio}
+          />
         </ScrollReveal>
       </div>
 

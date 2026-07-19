@@ -16,6 +16,7 @@ import { WeddingPageShell } from "@/components/wedding/WeddingPageShell";
 import { getDemoCouple } from "@/lib/demo-data";
 import { weddingImages, coupleInfo, getAllGalleryItems } from "@/lib/images";
 import { sortProgramItems } from "@/lib/couple-program";
+import { VENUE_MAP_LINK } from "@/lib/maps";
 
 async function getCouple() {
   try {
@@ -37,6 +38,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const couple = await getCouple();
   const data = couple || getDemoCouple();
+
+  // Keep family names in sync with current content (even if DB has older values)
+  data.groomFamily = "Mother: Simanesh Legese\nSister: Bizuayew Jemal";
+  data.brideFamily = "Mother: Dasash Fikadu\nSister: Enanu Kassie";
+
+  // Keep venue text in sync with current content
+  data.venueName = "Jambo Building";
+  data.venueAddress = "In front of Jambo Building, Addisu Gebeya, Addis Ababa, Ethiopia";
 
   if (locale === "am") {
     const { amharicData } = await import("@/lib/amharic-data");
@@ -79,7 +88,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           groomName={data.groomName}
           brideName={data.brideName}
           weddingDate={new Date(data.weddingDate)}
-          coverImage={data.coverImage}
+          coverImage={weddingImages.hero}
           requirePassword={false}
         />
       }
@@ -104,10 +113,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <LocationSection
         venueName={data.venueName}
         venueAddress={data.venueAddress}
-        mapLink={data.mapLink}
-        receptionName={data.receptionName}
-        receptionAddress={data.receptionAddress}
-        receptionMapLink={data.receptionMapLink}
+        mapLink={VENUE_MAP_LINK}
       />
       <FamilySection brideFamily={data.brideFamily} groomFamily={data.groomFamily} />
       <RsvpSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
@@ -123,8 +129,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         brideName={data.brideName}
         contactPhone={data.contactPhone}
         contactEmail={data.contactEmail}
-        socialInstagram={data.socialInstagram}
-        socialFacebook={data.socialFacebook}
       />
     </WeddingPageShell>
   );

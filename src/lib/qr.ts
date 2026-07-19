@@ -2,9 +2,10 @@ import QRCode from "qrcode";
 
 export async function generateQrDataUrl(data: string): Promise<string> {
   return QRCode.toDataURL(data, {
-    width: 300,
-    margin: 2,
-    color: { dark: "#2D2D2D", light: "#FFFDF8" },
+    width: 280,
+    margin: 3,
+    errorCorrectionLevel: "H",
+    color: { dark: "#1a1a1a", light: "#ffffff" },
   });
 }
 

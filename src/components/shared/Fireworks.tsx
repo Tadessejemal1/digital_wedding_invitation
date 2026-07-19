@@ -50,8 +50,7 @@ export function Fireworks() {
     }, 400);
 
     const animate = () => {
-      ctx.fillStyle = "rgba(0,0,0,0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
@@ -63,8 +62,9 @@ export function Fireworks() {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life;
+        ctx.globalAlpha = Math.max(p.life, 0);
         ctx.fill();
+        ctx.globalAlpha = 1;
 
         if (p.life <= 0) particles.splice(i, 1);
       }

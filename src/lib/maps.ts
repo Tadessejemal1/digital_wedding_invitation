@@ -1,10 +1,13 @@
 const PLACEHOLDER_PATTERNS = ["1234567890", "0x0%3A0x0", "0x0:0x0"];
 
-export const HOLY_TRINITY_MAP_LINK =
-  "https://www.google.com/maps/place/Holy+Trinity+Cathedral,+Addis+Ababa/@9.0310541,38.7660663,17z/data=!3m1!4b1!4m6!3m5!1s0x164b85b67f087347:0x40aafd183a32957!8m2!3d9.0310541!4d38.7686412!16zL20vMDEwODJq?entry=ttu";
+/** Venue location: 9.057490, 38.737534 */
+export const VENUE_MAP_LINK =
+  "https://maps.google.com/maps?q=9.057490,38.737534&ll=9.057490,38.737534&z=16";
 
-export const PARENTS_HOME_MAP_LINK =
-  "https://www.google.com/maps/place/8%C2%B048'56.0%22N+38%C2%B047'30.6%22E/@8.815556,38.791833,17z/data=!3m1!4b1!4m4!3m3!8m2!3d8.8155556!4d38.7918333?entry=ttu";
+/** @deprecated Use VENUE_MAP_LINK */
+export const HOLY_TRINITY_MAP_LINK = VENUE_MAP_LINK;
+
+export const PARENTS_HOME_MAP_LINK = VENUE_MAP_LINK;
 
 export function isInvalidMapEmbedUrl(url?: string | null): boolean {
   if (!url?.trim()) return true;
@@ -20,6 +23,16 @@ function coordsFromGoogleMapsLink(mapLink: string): { lat: string; lng: string }
   const dataMatch = mapLink.match(/!3d(-?\d+\.?\d*)!4d(-?\d+\.?\d*)/);
   if (dataMatch) {
     return { lat: dataMatch[1], lng: dataMatch[2] };
+  }
+
+  const qMatch = mapLink.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (qMatch) {
+    return { lat: qMatch[1], lng: qMatch[2] };
+  }
+
+  const llMatch = mapLink.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (llMatch) {
+    return { lat: llMatch[1], lng: llMatch[2] };
   }
 
   return null;

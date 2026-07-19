@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Fireworks } from "@/components/shared/Fireworks";
 import { GuestQrCard } from "@/components/invite/GuestQrCard";
+import { emailRsvpNotification } from "@/lib/web3forms-client";
 import { X } from "lucide-react";
 
 interface RsvpSectionProps {
@@ -55,7 +56,8 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
       return;
     }
 
-    const timer = window.setTimeout(() => setShowQr(true), 3000);
+    // Show QR promptly so guests can save it without a long wait
+    const timer = window.setTimeout(() => setShowQr(true), 400);
     return () => window.clearTimeout(timer);
   }, [popupOpen]);
 
@@ -84,6 +86,16 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
         setRsvpResult(data);
         setPopupOpen(true);
         if (form.attending) setShowFireworks(true);
+        // Web3Forms free plan requires client-side submit
+        void emailRsvpNotification({
+          name: form.name,
+          email: form.email || undefined,
+          phone: form.phone || undefined,
+          attending: form.attending,
+          guestCount: form.guestCount,
+          message: form.message || undefined,
+          qrCode: data.qrCode,
+        });
       } else {
         setError(data.error || t("error"));
       }
@@ -96,8 +108,9 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
 
   return (
     <>
+      {showFireworks && submittedAttending && popupOpen && <Fireworks />}
+
       <section id="rsvp" className="section-padding bg-wine text-white">
-        {showFireworks && submittedAttending && popupOpen && <Fireworks />}
         <SectionHeading title={t("title")} subtitle={t("subtitle")} className="[&_h2]:text-white [&_p]:text-white/80" />
         <ScrollReveal>
           <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-6">
@@ -148,41 +161,41 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4"
             onClick={closePopup}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
+              className="relative z-[210] max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={closePopup}
-                className="absolute right-4 top-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-wine"
+                className="absolute right-3 top-3 z-10 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-wine"
                 aria-label={t("closePopup")}
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="pt-2 text-center">
+              <div className="pt-1 text-center">
                 <p className="font-display text-2xl text-wine">{t("title")}</p>
-                <p className="font-serif mt-3 text-lg text-gray-700">
+                <p className="font-serif mt-2 text-base text-gray-700 sm:text-lg">
                   {submittedAttending ? t("success") : t("successDeclined")}
                 </p>
                 {submittedAttending && (
-                  <p className="mt-2 font-display text-gold">{t("fireworks")}</p>
+                  <p className="mt-1 font-display text-gold">{t("fireworks")}</p>
                 )}
               </div>
 
-              <div className="mt-6">
+              <div className="mt-4">
                 {!showQr ? (
-                  <p className="text-center text-sm text-gray-500">{t("qrPreparing")}</p>
+                  <p className="py-10 text-center text-sm text-gray-500">{t("qrPreparing")}</p>
                 ) : (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                    <p className="mb-4 text-center text-sm text-gray-600">{tCheckIn("rsvpQrNote")}</p>
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                    <p className="mb-3 text-center text-sm text-gray-600">{tCheckIn("rsvpQrNote")}</p>
                     <GuestQrCard
                       guestName={submittedName}
                       guestId={rsvpResult.guestId}
@@ -195,7 +208,7 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
                 )}
               </div>
 
-              <div className="mt-6 text-center">
+              <div className="mt-5 text-center">
                 <Button type="button" variant="outline" onClick={closePopup}>
                   {t("closePopup")}
                 </Button>

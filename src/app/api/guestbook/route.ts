@@ -12,18 +12,32 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = guestbookSchema.parse(body);
 
-    const entry = await prisma.guestbook.create({ data });
-
-    return NextResponse.json(entry);
+    try {
+      const entry = await prisma.guestbook.create({ data });
+      return NextResponse.json(entry);
+    } catch (dbError) {
+      console.error("Guestbook DB error:", dbError);
+      // Soft success so client can still email via Web3Forms
+      return NextResponse.json({
+        id: `local-${Date.now()}`,
+        guestName: data.guestName,
+        message: data.message,
+        createdAt: new Date().toISOString(),
+      });
+    }
   } catch {
     return NextResponse.json({ error: "Failed to submit message" }, { status: 400 });
   }
 }
 
 export async function GET() {
-  const entries = await prisma.guestbook.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-  return NextResponse.json(entries);
+  try {
+    const entries = await prisma.guestbook.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    return NextResponse.json(entries);
+  } catch {
+    return NextResponse.json([]);
+  }
 }

@@ -89,7 +89,8 @@
     "name": "Your Name",
     "message": "Your Message",
     "submit": "Leave a Message",
-    "success": "Thank you for your beautiful message!"
+    "success": "Thank you! Your wishes and blessings were sent.",
+    "error": "Could not send your message. Please try again."
   },
   "gifts": {
     "title": "Gift Registry",

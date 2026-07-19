@@ -4,7 +4,8 @@ function getWeb3FormsKey() {
   return (
     process.env.NEXT_PUBLIC_WEB3FORMS_KEY ||
     process.env.NEXT_PUBLIC_VITE_WEB3FORMS_KEY ||
-    ""
+    process.env.VITE_WEB3FORMS_KEY ||
+    "41c231d9-eaf2-4300-8f85-79e873cca6eb"
   );
 }
 
@@ -30,11 +31,12 @@ export async function submitWeb3FormsEmail(input: SubmitInput): Promise<boolean>
       body: JSON.stringify({
         access_key,
         name: input.name,
-        email: input.email || "guest@wedding.local",
+        email: input.email || "noreply@web3forms.com",
         subject: input.subject,
         message: input.message,
         from_name: "Tadesse & Hana Wedding",
         form_type: input.formType,
+        botcheck: false,
       }),
     });
 
@@ -84,8 +86,14 @@ export async function emailGuestbookNotification(input: {
 }) {
   return submitWeb3FormsEmail({
     name: input.guestName,
-    subject: `Wedding Guestbook - ${input.guestName}`,
-    message: `From: ${input.guestName}\n\n${input.message}`,
-    formType: "guestbook",
+    subject: `Wedding Wishes & Blessings - ${input.guestName}`,
+    message: [
+      "New guestbook message — wishes and blessings",
+      "",
+      `From: ${input.guestName}`,
+      "",
+      input.message,
+    ].join("\n"),
+    formType: "guestbook_wishes",
   });
 }

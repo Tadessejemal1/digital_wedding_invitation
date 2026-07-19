@@ -32,7 +32,8 @@
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",
-    "seconds": "Seconds"
+    "seconds": "Seconds",
+    "ourDay": "Our Day"
   },
   "program": {
     "title": "Wedding Program"

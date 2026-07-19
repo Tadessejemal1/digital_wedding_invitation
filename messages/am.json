@@ -32,7 +32,8 @@
     "days": "ቀናት",
     "hours": "ሰዓታት",
     "minutes": "ደቂቃዎች",
-    "seconds": "ሰከንዶች"
+    "seconds": "ሰከንዶች",
+    "ourDay": "ቀናችን"
   },
   "program": {
     "title": "የጋብቻ ፕሮግራም"

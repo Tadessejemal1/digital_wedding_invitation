@@ -28,8 +28,8 @@ export function Navigation() {
           scrolled ? "bg-white/95 shadow-md backdrop-blur-md" : "bg-transparent"
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-3 sm:px-4 sm:py-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               className={`lg:hidden ${scrolled ? "text-wine" : "text-white"}`}
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -37,7 +37,7 @@ export function Navigation() {
             >
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
-            <a href="#home" className={`font-display text-xl ${scrolled ? "text-wine" : "text-white"}`}>
+            <a href="#home" className={`font-display text-lg sm:text-xl ${scrolled ? "text-wine" : "text-white"}`}>
               T & H
             </a>
           </div>

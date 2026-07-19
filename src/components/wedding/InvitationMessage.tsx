@@ -19,12 +19,12 @@ export function InvitationMessage({ message }: InvitationMessageProps) {
       <div className="relative mx-auto max-w-3xl">
         <SectionHeading title={t("title")} />
         <ScrollReveal>
-          <blockquote className="relative px-8 text-center">
-            <span className="font-display absolute -left-2 -top-4 text-6xl text-gold/30">&ldquo;</span>
-            <p className="font-serif text-xl leading-relaxed italic text-gray-700 md:text-2xl">
+          <blockquote className="relative px-4 text-center sm:px-8">
+            <span className="font-display absolute left-0 top-0 text-4xl text-gold/30 sm:-left-2 sm:-top-4 sm:text-6xl">&ldquo;</span>
+            <p className="font-serif text-lg leading-relaxed italic text-gray-700 sm:text-xl md:text-2xl">
               {message}
             </p>
-            <span className="font-display absolute -bottom-8 -right-2 text-6xl text-gold/30">&rdquo;</span>
+            <span className="font-display absolute bottom-0 right-0 text-4xl text-gold/30 sm:-bottom-8 sm:-right-2 sm:text-6xl">&rdquo;</span>
           </blockquote>
         </ScrollReveal>
       </div>

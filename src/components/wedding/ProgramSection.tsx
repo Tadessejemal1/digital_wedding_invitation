@@ -15,13 +15,44 @@ interface ProgramSectionProps {
   items: ProgramItem[];
 }
 
+function ProgramCard({ item }: { item: ProgramItem }) {
+  return (
+    <div className="rounded-xl border border-gold/20 bg-white p-4 shadow-md sm:p-6">
+      <time className="font-display text-base text-gold sm:text-lg">{item.startTime}</time>
+      <h3 className="font-display mt-1 text-lg text-wine sm:text-xl">{item.title}</h3>
+      {item.description && (
+        <p className="mt-2 font-serif text-sm text-gray-600 sm:text-base">{item.description}</p>
+      )}
+    </div>
+  );
+}
+
 export function ProgramSection({ items }: ProgramSectionProps) {
   const t = useTranslations("program");
 
   return (
     <section id="program" className="section-padding">
       <SectionHeading title={t("title")} />
-      <div className="relative mx-auto max-w-3xl px-2 sm:px-4">
+
+      {/* Mobile: single column timeline */}
+      <div className="relative mx-auto max-w-xl md:hidden">
+        <div className="absolute bottom-0 left-4 top-0 w-px bg-gold/30" />
+        {items.map((item, index) => (
+          <ScrollReveal key={item.id} delay={index * 0.1}>
+            <div className="relative mb-6 flex items-start gap-4 pl-2">
+              <div className="relative z-10 mt-3 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-white">
+                <div className="h-2 w-2 rounded-full bg-gold" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <ProgramCard item={item} />
+              </div>
+            </div>
+          </ScrollReveal>
+        ))}
+      </div>
+
+      {/* Desktop: alternating timeline */}
+      <div className="relative mx-auto hidden max-w-3xl px-4 md:block">
         <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gold/30" />
         {items.map((item, index) => {
           const isLeft = index % 2 === 0;
@@ -29,32 +60,16 @@ export function ProgramSection({ items }: ProgramSectionProps) {
           return (
             <ScrollReveal key={item.id} delay={index * 0.1}>
               <div className="relative mb-8 flex items-start">
-                <div className={`w-[calc(50%-0.75rem)] ${isLeft ? "pr-3 sm:pr-4" : ""}`}>
-                  {isLeft && (
-                    <div className="rounded-xl border border-gold/20 bg-white p-4 shadow-md sm:p-6">
-                      <time className="font-display text-base text-gold sm:text-lg">{item.startTime}</time>
-                      <h3 className="font-display mt-1 text-lg text-wine sm:text-xl">{item.title}</h3>
-                      {item.description && (
-                        <p className="mt-2 font-serif text-sm text-gray-600 sm:text-base">{item.description}</p>
-                      )}
-                    </div>
-                  )}
+                <div className={`w-[calc(50%-0.75rem)] ${isLeft ? "pr-4" : ""}`}>
+                  {isLeft && <ProgramCard item={item} />}
                 </div>
 
                 <div className="absolute left-1/2 top-3 z-10 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-gold bg-white">
                   <div className="h-2 w-2 rounded-full bg-gold" />
                 </div>
 
-                <div className={`w-[calc(50%-0.75rem)] ${!isLeft ? "pl-3 sm:pl-4" : ""}`}>
-                  {!isLeft && (
-                    <div className="rounded-xl border border-gold/20 bg-white p-4 shadow-md sm:p-6">
-                      <time className="font-display text-base text-gold sm:text-lg">{item.startTime}</time>
-                      <h3 className="font-display mt-1 text-lg text-wine sm:text-xl">{item.title}</h3>
-                      {item.description && (
-                        <p className="mt-2 font-serif text-sm text-gray-600 sm:text-base">{item.description}</p>
-                      )}
-                    </div>
-                  )}
+                <div className={`w-[calc(50%-0.75rem)] ${!isLeft ? "pl-4" : ""}`}>
+                  {!isLeft && <ProgramCard item={item} />}
                 </div>
               </div>
             </ScrollReveal>

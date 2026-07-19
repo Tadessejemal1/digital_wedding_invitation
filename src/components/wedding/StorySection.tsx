@@ -29,21 +29,21 @@ function CouplePortrait({
   bio?: string | null;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gold/20 bg-white shadow-xl">
-      <div className="relative aspect-[3/4] w-full bg-[#f3efe6]">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-gold/20 bg-white shadow-xl">
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f3efe6]">
         <Image
           src={image}
           alt={name}
           fill
           quality={95}
           priority
-          className="object-contain object-center"
+          className="object-cover object-center"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
-      <div className="bg-gradient-to-b from-wine to-wine/95 px-6 py-5 text-center text-white">
+      <div className="bg-gradient-to-b from-wine to-wine/95 px-4 py-5 text-center text-white sm:px-6">
         <p className="text-sm uppercase tracking-widest text-gold-light">{role}</p>
-        <h3 className="font-display mt-1 text-3xl">{name}</h3>
+        <h3 className="font-display mt-1 text-2xl sm:text-3xl">{name}</h3>
         {bio && <p className="mt-2 font-serif text-sm italic text-white/90">{bio}</p>}
       </div>
     </div>
@@ -67,8 +67,8 @@ export function StorySection({
     <section id="story" className="section-padding bg-ivory">
       <SectionHeading title={t("title")} />
 
-      <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2 md:gap-10">
-        <ScrollReveal>
+      <div className="mx-auto grid max-w-5xl items-stretch gap-8 md:grid-cols-2 md:gap-10">
+        <ScrollReveal className="h-full">
           <CouplePortrait
             image={brideImage}
             name={brideName}
@@ -77,7 +77,7 @@ export function StorySection({
           />
         </ScrollReveal>
 
-        <ScrollReveal delay={0.2}>
+        <ScrollReveal className="h-full" delay={0.2}>
           <CouplePortrait
             image={groomImage}
             name={groomName}

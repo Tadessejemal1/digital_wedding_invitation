@@ -28,13 +28,13 @@ function toEthiopicNumeral(n: number): string {
 
 function TimeUnit({ value, label }: { value: number; label: string }) {
   return (
-    <motion.div className="flex flex-col items-center" whileHover={{ scale: 1.05 }}>
-      <div className="relative mb-2 flex h-20 w-20 items-center justify-center rounded-xl border border-gold/30 bg-white shadow-lg md:h-28 md:w-28">
-        <span className="font-display text-3xl text-wine md:text-5xl">
+    <motion.div className="flex min-w-0 flex-1 flex-col items-center" whileHover={{ scale: 1.05 }}>
+      <div className="relative mb-1.5 flex aspect-square w-full max-w-[4.5rem] items-center justify-center rounded-xl border border-gold/30 bg-white shadow-lg sm:mb-2 sm:max-w-[5rem] md:max-w-[7rem]">
+        <span className="font-display text-2xl text-wine sm:text-3xl md:text-5xl">
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="text-xs uppercase tracking-widest text-white/70 md:text-sm">{label}</span>
+      <span className="text-[10px] uppercase tracking-widest text-white/70 sm:text-xs md:text-sm">{label}</span>
     </motion.div>
   );
 }
@@ -87,9 +87,9 @@ function WeddingCalendar({ targetDate }: { targetDate: Date }) {
       </div>
 
       <div className="relative z-10 p-5 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-display text-xl text-wine sm:text-2xl">{monthLabel}</h3>
-          <span className="flex items-center gap-1 text-xs uppercase tracking-widest text-gold">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="font-display text-lg text-wine sm:text-xl md:text-2xl">{monthLabel}</h3>
+          <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-gold sm:text-xs">
             <Heart className="h-3.5 w-3.5 fill-wine text-wine" />
             {t("ourDay")}
           </span>
@@ -165,7 +165,7 @@ export function CountdownSection({ targetDate }: CountdownProps) {
   return (
     <section className="section-padding bg-wine text-white">
       <SectionHeading title={t("title")} className="[&_h2]:text-white [&_.decorative-line]:via-gold-light" />
-      <div className="mx-auto flex max-w-2xl justify-center gap-4 md:gap-8">
+      <div className="mx-auto flex w-full max-w-2xl justify-center gap-2 px-1 sm:gap-4 md:gap-8">
         <TimeUnit value={timeLeft.days} label={t("days")} />
         <TimeUnit value={timeLeft.hours} label={t("hours")} />
         <TimeUnit value={timeLeft.minutes} label={t("minutes")} />

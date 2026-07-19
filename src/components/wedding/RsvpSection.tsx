@@ -121,11 +121,11 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
 
             <div>
               <Label className="text-white/90">{t("attending")}</Label>
-              <div className="mt-2 flex gap-4">
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:gap-4">
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, attending: true })}
-                  className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
+                  className={`flex-1 rounded-lg px-2 py-3 text-xs font-medium transition-all sm:text-sm ${
                     form.attending ? "bg-gold text-white" : "border border-white/30 text-white/70"
                   }`}
                 >
@@ -134,7 +134,7 @@ export function RsvpSection({ coupleId, slug }: RsvpSectionProps) {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, attending: false })}
-                  className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
+                  className={`flex-1 rounded-lg px-2 py-3 text-xs font-medium transition-all sm:text-sm ${
                     !form.attending ? "bg-gold text-white" : "border border-white/30 text-white/70"
                   }`}
                 >

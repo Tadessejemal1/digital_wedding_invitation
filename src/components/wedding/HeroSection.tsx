@@ -93,9 +93,9 @@ export function HeroSection({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 mx-4 w-full max-w-md rounded-2xl border border-gold/30 bg-white/95 p-8 shadow-2xl backdrop-blur-md"
+          className="relative z-10 mx-3 w-full max-w-md rounded-2xl border border-gold/30 bg-white/95 p-5 shadow-2xl backdrop-blur-md sm:mx-4 sm:p-8"
         >
-          <h2 className="font-display mb-6 text-center text-2xl text-wine">
+          <h2 className="font-display mb-6 text-center text-xl text-wine sm:text-2xl">
             {groomName} & {brideName}
           </h2>
           <form onSubmit={handleUnlock} className="space-y-4">
@@ -118,12 +118,12 @@ export function HeroSection({
           </form>
         </motion.div>
       ) : (
-        <div className="relative z-10 mb-16 w-full px-4 text-center text-white md:mb-20">
+        <div className="relative z-10 mb-14 w-full px-3 text-center text-white sm:mb-16 sm:px-4 md:mb-20">
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-serif mb-3 text-lg italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] md:text-xl"
+            className="font-serif mb-2 text-base italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:mb-3 sm:text-lg md:text-xl"
           >
             {t("together")}
           </motion.p>
@@ -132,10 +132,10 @@ export function HeroSection({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="font-display mb-4 text-5xl font-light tracking-wider drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] md:text-7xl lg:text-8xl"
+            className="font-display mb-3 flex flex-col items-center gap-1 text-3xl font-light tracking-wide drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] sm:mb-4 sm:gap-0 sm:text-5xl sm:tracking-wider md:flex-row md:justify-center md:text-7xl lg:text-8xl"
           >
             <span className="shimmer-text">{groomName}</span>
-            <span className="mx-4 text-gold-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">&</span>
+            <span className="mx-0 text-2xl text-gold-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:mx-3 sm:text-[0.85em] md:mx-4">&</span>
             <span className="shimmer-text">{brideName}</span>
           </motion.h1>
 
@@ -143,7 +143,7 @@ export function HeroSection({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.9 }}
-            className="font-serif mx-auto mb-5 max-w-lg text-lg italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] md:text-xl"
+            className="font-serif mx-auto mb-4 max-w-lg px-1 text-base italic text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:mb-5 sm:text-lg md:text-xl"
           >
             {t("invite")}
           </motion.p>
@@ -152,7 +152,7 @@ export function HeroSection({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
-            className="font-display text-2xl tracking-wide text-gold-light drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] md:text-3xl"
+            className="font-display text-lg tracking-wide text-gold-light drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] sm:text-2xl md:text-3xl"
           >
             {formatWeddingDate(weddingDate, locale)}
           </motion.div>
@@ -165,7 +165,7 @@ export function HeroSection({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 text-white/90 drop-shadow-lg"
+          className="absolute bottom-5 left-1/2 z-20 -translate-x-1/2 text-white/90 drop-shadow-lg sm:bottom-8"
           aria-label="Scroll down"
         >
           <ChevronDown className="h-8 w-8 animate-bounce" />

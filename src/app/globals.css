@@ -18,6 +18,11 @@
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-text);
@@ -37,7 +42,7 @@ body {
 }
 
 .section-padding {
-  @apply px-4 py-20 md:px-8 lg:px-16 xl:px-24;
+  @apply px-3 py-12 sm:px-4 sm:py-16 md:px-8 md:py-20 lg:px-16 xl:px-24;
 }
 
 .gold-gradient {
@@ -57,7 +62,7 @@ body {
 
 .swiper-button-prev-custom,
 .swiper-button-next-custom {
-  @apply flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white;
+  @apply flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white sm:h-12 sm:w-12;
 }
 
 @keyframes float {
@@ -91,4 +96,50 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 90;
+}
+
+/* Printable A4 ring invitation — single page */
+.ring-program-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 210mm;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .ring-program-sheet {
+    min-height: 297mm;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .ring-program-page {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ring-program-sheet {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-width: none !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
 }

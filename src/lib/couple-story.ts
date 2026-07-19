@@ -1,5 +1,5 @@
 export const howTheyMetStory =
-  "Her sister shared her number so we could talk—I in Debre Tabor, she in Addis Ababa. After a year of calls, we first met in Bahir Dar about six years ago, and our relationship began. ❤️";
+  "We first connected from a distance through calls and messages. After getting to know each other for about a year, we met in person about six years ago—and our love story began. ❤️";
 
 export const journeyStory =
   "Together through challenges, laughter, love, and blessings—we are ready for marriage.";

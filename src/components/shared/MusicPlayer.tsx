@@ -17,31 +17,34 @@ export function MusicPlayer() {
   const t = useTranslations("music");
   const { unlocked, requirePassword, registerPlayWeddingMusic } = useInviteUnlock();
   const [playing, setPlaying] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const mediaRef = useRef<HTMLVideoElement>(null);
-  const startedRef = useRef(false);
   const showControls = !requirePassword || unlocked;
 
-  const playMedia = useCallback(async () => {
+  const playMedia = useCallback(async (preferMutedFallback = true) => {
     const media = mediaRef.current;
-    if (!media) return false;
+    if (!media || isMusicPausedByUser()) return false;
 
     try {
-      media.volume = 1;
       media.muted = false;
+      media.volume = 1;
       await media.play();
       setPlaying(true);
+      setSoundOn(true);
       persistMusicPausedByUser(false);
-      startedRef.current = true;
       return true;
     } catch {
+      if (!preferMutedFallback) {
+        setPlaying(false);
+        return false;
+      }
+
       try {
-        // Some browsers only allow muted autoplay first
+        // Browsers allow muted autoplay immediately — unmute on first gesture
         media.muted = true;
         await media.play();
-        media.muted = false;
         setPlaying(true);
-        persistMusicPausedByUser(false);
-        startedRef.current = true;
+        setSoundOn(false);
         return true;
       } catch {
         setPlaying(false);
@@ -50,73 +53,90 @@ export function MusicPlayer() {
     }
   }, []);
 
+  const unmuteAndPlay = useCallback(async () => {
+    const media = mediaRef.current;
+    if (!media || isMusicPausedByUser()) return false;
+
+    media.muted = false;
+    media.volume = 1;
+
+    try {
+      if (media.paused) await media.play();
+      setPlaying(true);
+      setSoundOn(true);
+      persistMusicPausedByUser(false);
+      return true;
+    } catch {
+      return playMedia(false);
+    }
+  }, [playMedia]);
+
   const pauseMedia = useCallback(() => {
     if (!mediaRef.current) return;
     mediaRef.current.pause();
     setPlaying(false);
+    setSoundOn(false);
     persistMusicPausedByUser(true);
   }, []);
 
   useEffect(() => {
     registerPlayWeddingMusic(() => {
-      void playMedia();
+      void unmuteAndPlay();
     });
     return () => registerPlayWeddingMusic(null);
-  }, [registerPlayWeddingMusic, playMedia]);
+  }, [registerPlayWeddingMusic, unmuteAndPlay]);
 
-  // Start music as soon as the invite link is opened
+  // Start playback immediately when the invite opens (no delay)
   useEffect(() => {
     if (!shouldAutoPlayMusic(requirePassword, unlocked)) return;
 
     let cancelled = false;
     const media = mediaRef.current;
 
-    const tryPlay = () => {
-      if (cancelled || isMusicPausedByUser() || startedRef.current) return;
-      void playMedia();
+    const tryImmediate = () => {
+      if (cancelled || isMusicPausedByUser()) return;
+      void playMedia(true);
     };
 
-    tryPlay();
-    const timers = [200, 500, 1200, 2500].map((ms) => window.setTimeout(tryPlay, ms));
+    tryImmediate();
 
-    const onReady = () => tryPlay();
+    const onReady = () => tryImmediate();
     media?.addEventListener("loadeddata", onReady);
     media?.addEventListener("canplay", onReady);
 
-    // Browser autoplay policy: start on first interaction with the page
-    const startOnGesture = () => {
+    const unlockSound = () => {
       if (cancelled || isMusicPausedByUser()) return;
-      void playMedia().then((ok) => {
+      void unmuteAndPlay().then((ok) => {
         if (ok) cleanupGestures();
       });
     };
 
     const cleanupGestures = () => {
-      window.removeEventListener("pointerdown", startOnGesture);
-      window.removeEventListener("click", startOnGesture);
-      window.removeEventListener("touchstart", startOnGesture);
-      window.removeEventListener("keydown", startOnGesture);
+      window.removeEventListener("pointerdown", unlockSound, true);
+      window.removeEventListener("touchstart", unlockSound, true);
+      window.removeEventListener("keydown", unlockSound, true);
+      window.removeEventListener("scroll", unlockSound, true);
     };
 
-    window.addEventListener("pointerdown", startOnGesture);
-    window.addEventListener("click", startOnGesture);
-    window.addEventListener("touchstart", startOnGesture, { passive: true });
-    window.addEventListener("keydown", startOnGesture);
+    // Capture phase so first tap/scroll unlocks sound instantly
+    window.addEventListener("pointerdown", unlockSound, true);
+    window.addEventListener("touchstart", unlockSound, { capture: true, passive: true });
+    window.addEventListener("keydown", unlockSound, true);
+    window.addEventListener("scroll", unlockSound, true);
 
     return () => {
       cancelled = true;
-      timers.forEach(window.clearTimeout);
       media?.removeEventListener("loadeddata", onReady);
       media?.removeEventListener("canplay", onReady);
       cleanupGestures();
     };
-  }, [unlocked, requirePassword, playMedia]);
+  }, [unlocked, requirePassword, playMedia, unmuteAndPlay]);
 
   const toggle = () => {
-    if (playing) {
+    if (playing && soundOn) {
       pauseMedia();
     } else {
-      void playMedia();
+      void unmuteAndPlay();
     }
   };
 
@@ -126,6 +146,7 @@ export function MusicPlayer() {
         ref={mediaRef}
         loop
         autoPlay
+        muted
         playsInline
         preload="auto"
         className="pointer-events-none fixed h-px w-px opacity-0"
@@ -133,15 +154,14 @@ export function MusicPlayer() {
       />
       {showControls && (
         <motion.button
-          initial={{ opacity: 0, scale: 0 }}
+          initial={{ opacity: 1, scale: 1 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
           onClick={toggle}
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white"
-          aria-label={playing ? t("pause") : t("play")}
+          className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-gold/30 bg-white/90 text-wine shadow-lg backdrop-blur-sm transition-all hover:bg-gold hover:text-white sm:bottom-6 sm:right-6 sm:h-12 sm:w-12"
+          aria-label={playing && soundOn ? t("pause") : t("play")}
         >
           <AnimatePresence mode="wait">
-            {playing ? (
+            {playing && soundOn ? (
               <motion.span key="pause" initial={{ scale: 0 }} animate={{ scale: 1 }}>
                 <Pause className="h-5 w-5" />
               </motion.span>

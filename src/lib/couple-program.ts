@@ -1,17 +1,17 @@
 export const weddingProgram = [
   {
     title: "Bridal House",
-    startTime: "06:00 AM LT",
+    startTime: "12:00 PM",
     description: "The celebration begins at the bridal house.",
   },
   {
     title: "Lunch Ceremony",
-    startTime: "07:00 AM LT",
+    startTime: "01:00 PM",
     description: "Lunch ceremony with family and guests.",
   },
   {
     title: "Go to Stay House",
-    startTime: "01:00 AM LT (Night)",
+    startTime: "07:00 PM",
     description: "The couple proceeds to their stay house for the night.",
   },
 ] as const;

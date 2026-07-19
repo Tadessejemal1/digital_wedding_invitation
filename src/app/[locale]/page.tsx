@@ -15,7 +15,7 @@ import { Footer } from "@/components/wedding/Footer";
 import { WeddingPageShell } from "@/components/wedding/WeddingPageShell";
 import { getDemoCouple } from "@/lib/demo-data";
 import { weddingImages, coupleInfo, getAllGalleryItems } from "@/lib/images";
-import { sortProgramItems } from "@/lib/couple-program";
+import { sortProgramItems, weddingProgram } from "@/lib/couple-program";
 import { VENUE_MAP_LINK } from "@/lib/maps";
 import { howTheyMetStory, journeyStory } from "@/lib/couple-story";
 
@@ -50,6 +50,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   data.howTheyMet = howTheyMetStory;
   data.journey = journeyStory;
   data.contactPhone = "+251715664630 / +251985810221";
+
+  // Keep program times in sync (even if DB has older values with "LT")
+  if (data.program) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (data as any).program = data.program.map((p: { title: string }) => {
+      const source = weddingProgram.find((item) => item.title === p.title);
+      return source ? { ...p, startTime: source.startTime, description: source.description } : p;
+    });
+  }
 
   if (locale === "am") {
     const { amharicData } = await import("@/lib/amharic-data");

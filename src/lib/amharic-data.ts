@@ -15,17 +15,17 @@ export const amharicData = {
   program: {
     "Bridal House": {
       title: "የሙሽሪት ቤት",
-      startTime: "12:00 (ከሰዓት)",
+      startTime: "06:00 (ከሰዓት)",
       description: "ክብረ በዓሉ በሙሽሪት ቤት ይጀምራል።"
     },
     "Lunch Ceremony": {
       title: "የምሳ ፕሮግራም",
-      startTime: "01:00 (ከሰዓት)",
+      startTime: "07:00 (ከሰዓት)",
       description: "የምሳ ፕሮግራም ከቤተሰብ እና ከእንግዶች ጋር።"
     },
     "Go to Stay House": {
       title: "ወደ ማረፊያ ቤት",
-      startTime: "07:00 (ማታ)",
+      startTime: "01:00 (ማታ)",
       description: "ሙሽሮቹ ወደ ማረፊያ ቤታቸው ያመራሉ።"
     }
   },

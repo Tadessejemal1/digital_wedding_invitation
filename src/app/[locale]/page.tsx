@@ -17,6 +17,7 @@ import { getDemoCouple } from "@/lib/demo-data";
 import { weddingImages, coupleInfo, getAllGalleryItems } from "@/lib/images";
 import { sortProgramItems } from "@/lib/couple-program";
 import { VENUE_MAP_LINK } from "@/lib/maps";
+import { howTheyMetStory, journeyStory } from "@/lib/couple-story";
 
 async function getCouple() {
   try {
@@ -46,6 +47,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // Keep venue text in sync with current content
   data.venueName = "Jambo Building";
   data.venueAddress = "In front of Jambo Building, Addisu Gebeya, Addis Ababa, Ethiopia";
+  data.howTheyMet = howTheyMetStory;
+  data.journey = journeyStory;
 
   if (locale === "am") {
     const { amharicData } = await import("@/lib/amharic-data");

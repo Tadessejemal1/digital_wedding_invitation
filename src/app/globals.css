@@ -98,19 +98,24 @@ body {
   z-index: 90;
 }
 
-/* Printable A4 ring invitation — single page */
-.ring-program-sheet {
-  position: relative;
-  width: 100%;
-  max-width: 210mm;
-  min-height: 0;
-  box-sizing: border-box;
+/* Printable A4 ring invitation — full page on screen and in print */
+.ring-program-viewport {
+  width: 210mm;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (min-width: 768px) {
-  .ring-program-sheet {
-    min-height: 297mm;
-  }
+.ring-program-scale {
+  width: 210mm;
+}
+
+.ring-program-sheet {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-width: 210mm;
+  box-sizing: border-box;
 }
 
 @media print {
@@ -132,12 +137,22 @@ body {
     margin: 0 !important;
   }
 
+  .ring-program-viewport {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .ring-program-scale {
+    transform: none !important;
+    width: auto !important;
+  }
+
   .ring-program-sheet {
     width: 210mm !important;
     height: 297mm !important;
     min-height: 297mm !important;
     max-width: none !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     overflow: hidden !important;
     box-shadow: none !important;
     page-break-inside: avoid;

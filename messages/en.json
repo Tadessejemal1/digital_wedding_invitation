@@ -8,6 +8,7 @@
     "rsvp": "Attendance",
     "checkIn": "Entrance QR",
     "guestbook": "Guestbook",
+    "sharePhotos": "Share Photos",
     "gifts": "Gifts"
   },
   "hero": {
@@ -29,10 +30,14 @@
   },
   "countdown": {
     "title": "Counting Down to Our Day",
+    "titlePassed": "Days Since Our Day",
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",
     "seconds": "Seconds",
+    "daysPassed": "Days Passed",
+    "passedMessage": "Our wedding day was {days} day(s) ago",
+    "todayMessage": "Today is our wedding day!",
     "ourDay": "Our Day"
   },
   "program": {
@@ -65,7 +70,7 @@
   },
   "rsvp": {
     "title": "Attendance",
-    "subtitle": "Please let us know if you can join us",
+    "subtitle": "Let us know if you will join us — no invite code needed here",
     "name": "Full Name",
     "email": "Email",
     "phone": "Phone",
@@ -80,7 +85,9 @@
     "success": "Thank you! Your confirmation has been received.",
     "successDeclined": "Thank you for letting us know. We will miss you!",
     "fireworks": "We can't wait to celebrate with you!",
-    "qrPreparing": "Your entrance QR code will appear in a moment...",
+    "qrHint": "Your entrance QR is not on this form. Open the personal invitation link the couple sent you — that page shows your one-time entrance QR.",
+    "qrAfterRsvp": "For the door QR, open the personal invitation link you received from the couple.",
+    "getQrLink": "How do I get my entrance QR?",
     "closePopup": "Close",
     "error": "Could not submit your confirmation. Please try again."
   },
@@ -93,6 +100,22 @@
     "success": "Thank you! Your wishes and blessings were sent.",
     "error": "Could not send your message. Please try again."
   },
+  "sharePhotos": {
+    "title": "Share a Photo",
+    "subtitle": "Send us a special moment — only the couple can see these",
+    "name": "Your Name",
+    "photo": "Choose a Photo",
+    "hint": "JPG, PNG, or WEBP up to 4 MB. Maximum 60 photos total.",
+    "submit": "Upload Photo",
+    "success": "Thank you! Your photo was shared with the couple.",
+    "error": "Could not upload your photo. Please try again.",
+    "needPhoto": "Please choose a photo to upload.",
+    "slots": "{count} of {limit} photos shared",
+    "remaining": "{remaining} left",
+    "full": "Full",
+    "limitReached": "The photo album is full (60 photos). Thank you for sharing!",
+    "adminOnly": "Photos are private — only the couple can view and download them."
+  },
   "gifts": {
     "title": "Gift Registry",
     "subtitle": "Your presence is the greatest gift, but if you wish to bless us further",
@@ -102,30 +125,37 @@
     "registry": "Gift Registry",
     "viewRegistry": "View Gift Registry"
   },
+  "myInvite": {
+    "title": "Your entrance invitation QR",
+    "loading": "Preparing your entrance QR…",
+    "invalid": "This invitation link is not valid. Please contact the couple.",
+    "saveHint": "Save or screenshot this QR — show it once at the wedding entrance.",
+    "oneTime": "One invitation = one entrance. After scan it cannot be used again.",
+    "openSite": "Open full invitation website"
+  },
   "checkIn": {
     "title": "Entrance Invitation QR",
-    "subtitle": "Show this QR code at the wedding entrance for check-in",
-    "notice": "This QR code is for wedding entrance check-in only. It is separate from the Gift Registry section below.",
-    "searchLabel": "Find your invitation",
-    "searchPlaceholder": "Enter your full name, phone, or email",
-    "findQr": "Get My QR Code",
-    "searching": "Searching...",
-    "searchAgain": "Search again",
-    "notFound": "No invitation found. Please RSVP first or contact the couple.",
-    "lookupError": "Could not look up your invitation. Please try again.",
+    "subtitle": "One invitation QR = one entrance. Show it once at the wedding door.",
+    "cardTitle": "Your Entrance Card",
+    "cardSubtitle": "Show this QR once at the wedding door",
+    "loadingCard": "Preparing your entrance card…",
+    "invalidInvite": "This invitation is not valid. Please contact the couple.",
     "entranceOnly": "Entrance Check-In",
     "invitationId": "Invitation ID",
-    "scanAtEntrance": "Present this QR code at the wedding entrance",
+    "scanAtEntrance": "Present this QR once at the wedding entrance",
+    "oneEntrance": "Valid for one entrance only — after scan it is marked checked in",
     "notForGifts": "This is not a payment or gift link",
-    "checkedIn": "Checked In",
+    "checkedIn": "Checked In (entrance used)",
     "awaitingCheckIn": "Awaiting Check-In",
     "openDigitalInvite": "Open full digital invitation",
-    "rsvpQrNote": "Save this QR code — you will need it at the wedding entrance"
+    "rsvpQrNote": "Save this QR — one invitation for one entrance. Staff will mark you checked in when scanned."
   },
   "footer": {
     "contact": "Contact Us",
+    "coordinatorPhone": "Coordinator phone",
     "followUs": "Follow Us",
-    "copyright": "Made by Entro Ethiopia Software Company"
+    "builtBy": "Built by",
+    "copyright": "Entro-Weeding"
   },
   "invite": {
     "title": "Your Digital Invitation",

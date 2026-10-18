@@ -1,61 +1,29 @@
 const galleryPhotos = [
-  // Studio couple
-  "0K8A0067.JPG",
-  "0K8A0087.JPG",
-  "0K8A0133.JPG",
-  // Traditional cultural couple
-  "0K8A0218.JPG",
-  "0K8A0230.JPG",
-  "0K8A0246.JPG",
-  "0K8A0250.JPG",
-  "0K8A0271.JPG",
-  "0K8A0291.JPG",
-  // Outdoor western couple
-  "0K8A0342.JPG",
-  "0K8A0366.JPG",
-  "0K8A0450.JPG",
-  // Twilight & night couple
-  "0K8A0529.JPG",
-  "0K8A0538.JPG",
-  "0K8A0606.JPG",
-  "0K8A0652.JPG",
-  "0K8A0711.JPG",
-  "0K8A0809.JPG",
-  "0K8A0866.JPG",
-  "0K8A0873.JPG",
+  "DSC04821-Recovered.jpg",
+  "DSC04900-Recovered.jpg",
+  "DSC04901-Recovered.jpg",
+  "DSC04993-Recovered.jpg",
+  "DSC05039-Recovered.jpg",
+  "DSC05073-Recovered.jpg",
 ] as const;
 
 const photoMeta: Record<string, { caption: string; category: string }> = {
-  "0K8A0067.JPG": { caption: "Together in white", category: "pre-wedding" },
-  "0K8A0087.JPG": { caption: "A quiet moment", category: "pre-wedding" },
-  "0K8A0133.JPG": { caption: "Love and tenderness", category: "pre-wedding" },
-  "0K8A0218.JPG": { caption: "In traditional attire", category: "engagement" },
-  "0K8A0230.JPG": { caption: "Heritage outdoors", category: "engagement" },
-  "0K8A0246.JPG": { caption: "Traditional beauty", category: "engagement" },
-  "0K8A0250.JPG": { caption: "Heritage portrait", category: "engagement" },
-  "0K8A0271.JPG": { caption: "Our heritage together", category: "engagement" },
-  "0K8A0291.JPG": { caption: "Side by side", category: "engagement" },
-  "0K8A0342.JPG": { caption: "Walking into forever", category: "engagement" },
-  "0K8A0366.JPG": { caption: "Eyes only for each other", category: "engagement" },
-  "0K8A0450.JPG": { caption: "Parkside portrait", category: "engagement" },
-  "0K8A0529.JPG": { caption: "Twilight together", category: "engagement" },
-  "0K8A0538.JPG": { caption: "By the fountains", category: "engagement" },
-  "0K8A0606.JPG": { caption: "Blue hour", category: "engagement" },
-  "0K8A0652.JPG": { caption: "Sparkling night", category: "engagement" },
-  "0K8A0711.JPG": { caption: "Under our flag", category: "engagement" },
-  "0K8A0809.JPG": { caption: "Nighttime celebration", category: "engagement" },
-  "0K8A0866.JPG": { caption: "Night smiles", category: "engagement" },
-  "0K8A0873.JPG": { caption: "Close and joyful", category: "engagement" },
+  "DSC04821-Recovered.jpg": { caption: "Together", category: "engagement" },
+  "DSC04900-Recovered.jpg": { caption: "Our promise", category: "engagement" },
+  "DSC04901-Recovered.jpg": { caption: "Side by side", category: "engagement" },
+  "DSC04993-Recovered.jpg": { caption: "Joyful moments", category: "engagement" },
+  "DSC05039-Recovered.jpg": { caption: "With love", category: "engagement" },
+  "DSC05073-Recovered.jpg": { caption: "Forever starts here", category: "engagement" },
 };
 
 export const weddingImages = {
-  hero: "/images/0K8A0230.JPG",
-  bride: "/images/0K8A0023.JPG",
-  groom: "/images/0K8A0478.JPG",
+  hero: "/Eden/DSC05073-Recovered.jpg",
+  bride: "/Eden/DSC05039-Recovered.jpg",
+  groom: "/Eden/DSC04900-Recovered.jpg",
   gallery: galleryPhotos.map((file) => {
     const meta = photoMeta[file] ?? { caption: "Our moments", category: "engagement" };
     return {
-      imageUrl: `/images/${file}`,
+      imageUrl: `/Eden/${file}`,
       caption: meta.caption,
       category: meta.category,
     };
@@ -63,9 +31,9 @@ export const weddingImages = {
 } as const;
 
 export const coupleInfo = {
-  slug: "TADESSE-HANA",
-  groomName: "Tadesse",
-  brideName: "Hana",
+  slug: "ANDINET-EDEN",
+  groomName: "Andinet Ayaleu",
+  brideName: "Eden Shimeles",
 } as const;
 
 export function getAllGalleryItems(

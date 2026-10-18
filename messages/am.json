@@ -8,6 +8,7 @@
     "rsvp": "መገኘት ማረጋገጫ",
     "checkIn": "መግቢያ QR",
     "guestbook": "የእንግዶች መዝገብ",
+    "sharePhotos": "ፎቶ ያጋሩ",
     "gifts": "ስጦታ"
   },
   "hero": {
@@ -29,10 +30,14 @@
   },
   "countdown": {
     "title": "ለቀናችን እየቆጠርን ነው",
+    "titlePassed": "ከቀናችን በኋላ ያለፉ ቀናት",
     "days": "ቀናት",
     "hours": "ሰዓታት",
     "minutes": "ደቂቃዎች",
     "seconds": "ሰከንዶች",
+    "daysPassed": "ያለፉ ቀናት",
+    "passedMessage": "የጋብቻ ቀናችን ከ{days} ቀን በፊት ነበር",
+    "todayMessage": "ዛሬ የጋብቻ ቀናችን ነው!",
     "ourDay": "ቀናችን"
   },
   "program": {
@@ -65,7 +70,7 @@
   },
   "rsvp": {
     "title": "መገኘት ማረጋገጫ",
-    "subtitle": "እባክዎ መገኘት እንደሚችሉ ያሳውቁን",
+    "subtitle": "መገኘትዎን ያሳውቁን — እዚህ invite ኮድ አያስፈልግም",
     "name": "ሙሉ ስም",
     "email": "ኢሜይል",
     "phone": "ስልክ",
@@ -80,7 +85,9 @@
     "success": "አመሰግናለን! ማረጋገጫዎ ተቀብለናል።",
     "successDeclined": "እንደማይመጡ ስላሳወቁን አመሰግናለን።",
     "fireworks": "ከእናንተ ጋር ለመከበር በጉጉት እንጠብቃለን!",
-    "qrPreparing": "የመግቢያ QR ኮድዎ በጥቂት ሰከንድ ውስጥ ይታያል...",
+    "qrHint": "የመግቢያ QR በዚህ ቅጽ አይገኝም። ቤተሰቡ የላከልዎትን የግል ግብዣ ሊንክ ይክፈቱ — የአንድ ጊዜ የመግቢያ QR እዚያ ይታያል።",
+    "qrAfterRsvp": "ለመግቢያ QR፣ ቤተሰቡ የላከልዎትን የግል ግብዣ ሊንክ ይክፈቱ።",
+    "getQrLink": "የመግቢያ QR እንዴት አገኛለሁ?",
     "closePopup": "ዝጋ",
     "error": "ማረጋገጫ መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
   },
@@ -93,6 +100,22 @@
     "success": "አመሰግናለን! መልእክትዎ በኢሜይል ተልኳል።",
     "error": "መልእክትዎ አልተላከም። እባክዎ እንደገና ይሞክሩ።"
   },
+  "sharePhotos": {
+    "title": "ፎቶ ያጋሩ",
+    "subtitle": "ልዩ ጊዜዎን ይላኩልን — ፎቶዎቹን ብቻ ቤተሰቡ ያያል",
+    "name": "ስምዎ",
+    "photo": "ፎቶ ይምረጡ",
+    "hint": "JPG፣ PNG ወይም WEBP እስከ 4 ሜባ። በአጠቃላይ ቢበዛ 60 ፎቶ።",
+    "submit": "ፎቶ ይላኩ",
+    "success": "አመሰግናለን! ፎቶዎ ለቤተሰቡ ተጋርቷል።",
+    "error": "ፎቶ ማስገባት አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "needPhoto": "እባክዎ ለማስገባት ፎቶ ይምረጡ።",
+    "slots": "{count} ከ {limit} ፎቶ ተጋርቷል",
+    "remaining": "{remaining} ቀርቷል",
+    "full": "ሞልቷል",
+    "limitReached": "የፎቶ አልበሙ ሞልቷል (60 ፎቶ)። ስላጋሩ እናመሰግናለን!",
+    "adminOnly": "ፎቶዎች የግል ናቸው — ማየትና ማውረድ የሚችሉት ቤተሰቡ ብቻ ነው።"
+  },
   "gifts": {
     "title": "የስጦታ መዝገብ",
     "subtitle": "መገኘትዎ ትልቁ ስጦታ ነው፣ ነገር ግን ተጨማሪ ለመባርክ ከፈለጉ",
@@ -102,30 +125,37 @@
     "registry": "Gift Registry",
     "viewRegistry": "Gift Registry ይመልከቱ"
   },
+  "myInvite": {
+    "title": "የመግቢያ ግብዣ QRዎ",
+    "loading": "የመግቢያ QRዎ በመዘጋጀት ላይ…",
+    "invalid": "ይህ የግብዣ ሊንክ ልክ አይደለም። እባክዎ ቤተሰቡን ያግኙ።",
+    "saveHint": "ይህን QR ያስቀምጡ ወይም ስክሪንሹት ያድርጉ — በመግቢያ አንድ ጊዜ ያሳዩ።",
+    "oneTime": "አንድ ግብዣ = አንድ መግቢያ። ከቃኘ በኋላ እንደገና አይሰራም።",
+    "openSite": "ሙሉ ግብዣ ድረ-ገጽ ይክፈቱ"
+  },
   "checkIn": {
     "title": "መግቢያ ግብዣ QR",
-    "subtitle": "በሥነ-ስርዓቱ መግቢያ ላይ ለመመዝገብ ይህን QR ኮድ ያሳዩ",
-    "notice": "ይህ QR ኮድ ለመግቢያ check-in ብቻ ነው። ከስጦታ registry ክፍል የተለየ ነው።",
-    "searchLabel": "ግብዣዎን ያግኙ",
-    "searchPlaceholder": "ሙሉ ስም፣ ስልክ ወይም ኢሜይል ያስገቡ",
-    "findQr": "QR ኮዴዬን አግኝ",
-    "searching": "በመፈለግ ላይ...",
-    "searchAgain": "እንደገና ፈልግ",
-    "notFound": "ግብዣ አልተገኘም። እባክዎ መጀመሪያ RSVP ያድርጉ።",
-    "lookupError": "ግብዣ ሊገኝ አልቻለም። እንደገና ይሞክሩ።",
+    "subtitle": "አንድ ግብዣ QR = አንድ መግቢያ። በሥነ-ስርዓቱ በር አንድ ጊዜ ያሳዩ።",
+    "cardTitle": "የመግቢያ ካርድዎ",
+    "cardSubtitle": "ይህን QR በሥነ-ስርዓቱ በር አንድ ጊዜ ያሳዩ",
+    "loadingCard": "የመግቢያ ካርድዎ በመዘጋጀት ላይ…",
+    "invalidInvite": "ይህ ግብዣ ልክ አይደለም። እባክዎ ቤተሰቡን ያግኙ።",
     "entranceOnly": "መግቢያ Check-In",
     "invitationId": "የግብዣ መለያ",
-    "scanAtEntrance": "በሥነ-ስርዓቱ መግቢያ ይህን QR ኮድ ያሳዩ",
+    "scanAtEntrance": "በሥነ-ስርዓቱ መግቢያ ይህን QR አንድ ጊዜ ያሳዩ",
+    "oneEntrance": "ለአንድ መግቢያ ብቻ ነው — ከቃኘ በኋላ checked in ይሆናል",
     "notForGifts": "ይህ የክፍያ ወይም የስጦታ ሊንክ አይደለም",
-    "checkedIn": "ተመዝግበዋል",
+    "checkedIn": "ተመዝግበዋል (መግቢያ ተጠቅሟል)",
     "awaitingCheckIn": "መመዝገብ በመጠባበቅ ላይ",
     "openDigitalInvite": "ሙሉ ዲጂታል ግብዣ ይክፈቱ",
-    "rsvpQrNote": "ይህን QR ኮድ ያስቀምጡ — በመግቢያ ያስፈልግዎታል"
+    "rsvpQrNote": "ይህን QR ያስቀምጡ — አንድ ግብዣ ለአንድ መግቢያ። ሲቃኝ checked in ይሆናሉ።"
   },
   "footer": {
     "contact": "ያግኙን",
+    "coordinatorPhone": "የአስተባባሪ ስልክ",
     "followUs": "ይከተሉን",
-    "copyright": "በ Entro Ethiopia Software Company ተሰራ"
+    "builtBy": "Built by",
+    "copyright": "Entro-Weeding"
   },
   "invite": {
     "title": "ዲጂታል ግብዣዎ",

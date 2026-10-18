@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { coupleInfo } from "@/lib/images";
-import { Users, CheckCircle, XCircle, QrCode, LogOut } from "lucide-react";
+import { Users, CheckCircle, XCircle, QrCode, LogOut, Copy, Check, ImageIcon } from "lucide-react";
+import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
+import { GUEST_PHOTO_LIMIT } from "@/lib/guest-photos";
 
 interface Analytics {
   totalGuests: number;
@@ -16,13 +18,17 @@ interface Analytics {
   confirmed: number;
   declined: number;
   guestbookCount: number;
+  guestPhotoCount?: number;
+  coupleId?: string;
 }
 
 interface Guest {
   id: string;
+  coupleId?: string;
   name: string;
   email: string | null;
   phone: string | null;
+  inviteCode: string;
   qrCode: string;
   status: string;
   checkedInAt: string | null;
@@ -37,6 +43,13 @@ export default function AdminDashboard() {
   const [scanResult, setScanResult] = useState<string>("");
   const [newGuest, setNewGuest] = useState({ name: "", email: "", phone: "" });
   const [coupleId, setCoupleId] = useState("");
+  const [addError, setAddError] = useState("");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [lastCreatedCode, setLastCreatedCode] = useState<string | null>(null);
+  const [qrGuest, setQrGuest] = useState<Guest | null>(null);
+  const [bulkNames, setBulkNames] = useState("");
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkResult, setBulkResult] = useState("");
 
   const fetchData = useCallback(async () => {
     const [analyticsRes, guestsRes] = await Promise.all([
@@ -49,17 +62,33 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
+    if (analyticsRes.ok) {
+      const a = await analyticsRes.json();
+      setAnalytics(a);
+      if (a.coupleId) setCoupleId(a.coupleId);
+    }
     if (guestsRes.ok) {
       const guestList = await guestsRes.json();
       setGuests(guestList);
-      if (guestList.length > 0 && !coupleId) {
+      if (guestList.length > 0 && guestList[0].coupleId) {
         setCoupleId(guestList[0].coupleId);
       }
     }
-  }, [router, coupleId]);
+  }, [router]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const copyText = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // ignore
+    }
+  };
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +98,9 @@ export default function AdminDashboard() {
       try {
         const parsed = JSON.parse(scanInput);
         if (parsed.qrCode) qrCode = parsed.qrCode;
-      } catch { /* plain QR code string */ }
+      } catch {
+        /* plain QR code string */
+      }
 
       const res = await fetch("/api/checkin", {
         method: "POST",
@@ -79,11 +110,15 @@ export default function AdminDashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        setScanResult(`✓ ${data.guest.name} checked in successfully!`);
+        setScanResult(`✓ ${data.guest.name} checked in — invitation used for entrance`);
         setScanInput("");
         fetchData();
       } else if (data.duplicate) {
-        setScanResult(`⚠ ${data.guest.name} is already checked in`);
+        setScanResult(`⚠ ${data.guest.name} already checked in — one invitation, one entrance only`);
+      } else if (data.notAttending) {
+        setScanResult(`✗ ${data.guest?.name || "Guest"} did not confirm attendance`);
+      } else if (data.notInvited) {
+        setScanResult(`✗ Not an invited guest`);
       } else {
         setScanResult(`✗ ${data.error || "Check-in failed"}`);
       }
@@ -94,14 +129,78 @@ export default function AdminDashboard() {
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAddError("");
+    setLastCreatedCode(null);
     const res = await fetch("/api/guests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...newGuest, coupleId: coupleId || "demo-couple" }),
+      body: JSON.stringify({
+        ...newGuest,
+        coupleId: coupleId || undefined,
+        slug: coupleInfo.slug,
+      }),
     });
+    const data = await res.json().catch(() => ({}));
     if (res.ok) {
       setNewGuest({ name: "", email: "", phone: "" });
+      setLastCreatedCode(data.inviteCode);
+      if (data.coupleId) setCoupleId(data.coupleId);
+      // Immediately show one-time QR ready to download & send to the guest
+      setQrGuest({
+        id: data.id,
+        name: data.name,
+        email: data.email ?? null,
+        phone: data.phone ?? null,
+        inviteCode: data.inviteCode,
+        qrCode: data.qrCode,
+        status: data.status || "PENDING",
+        checkedInAt: null,
+        rsvp: null,
+        coupleId: data.coupleId,
+      });
       fetchData();
+    } else {
+      setAddError(data.error || "Failed to add guest");
+    }
+  };
+
+  const handleBulkImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBulkResult("");
+    setAddError("");
+    const names = bulkNames
+      .split(/\r?\n/)
+      .map((line) => line.split(",")[0]?.trim() || "")
+      .filter(Boolean);
+
+    if (names.length === 0) {
+      setBulkResult("✗ Paste at least one name (one per line)");
+      return;
+    }
+
+    setBulkLoading(true);
+    try {
+      const res = await fetch("/api/guests/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          names,
+          coupleId: coupleId || undefined,
+          slug: coupleInfo.slug,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBulkResult(`✓ Imported ${data.count} guests — copy personal links from the list below`);
+        setBulkNames("");
+        fetchData();
+      } else {
+        setBulkResult(`✗ ${data.error || "Import failed"}`);
+      }
+    } catch {
+      setBulkResult("✗ Network error");
+    } finally {
+      setBulkLoading(false);
     }
   };
 
@@ -109,6 +208,16 @@ export default function AdminDashboard() {
     await fetch("/api/admin/login", { method: "DELETE" });
     router.push("/admin");
   };
+
+  const personalInviteLink = (inviteCode: string) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    // Full public wedding site + Entrance Card section for this guest
+    return `${origin}/am?invite=${encodeURIComponent(inviteCode)}#check-in`;
+  };
+
+  const inviteListText = guests
+    .map((g) => `${g.name}\n${personalInviteLink(g.inviteCode)}`)
+    .join("\n\n");
 
   const stats = [
     { label: "Total Guests", value: analytics?.totalGuests ?? 0, icon: Users, color: "text-wine" },
@@ -123,6 +232,15 @@ export default function AdminDashboard() {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <h1 className="font-display text-2xl text-wine">Admin Dashboard</h1>
           <div className="flex items-center gap-2">
+            <Link href="/admin/photos">
+              <Button variant="outline">
+                <ImageIcon className="mr-1 h-4 w-4" />
+                Guest Photos
+                {typeof analytics?.guestPhotoCount === "number"
+                  ? ` (${analytics.guestPhotoCount}/${GUEST_PHOTO_LIMIT})`
+                  : ""}
+              </Button>
+            </Link>
             <Link href="/admin/checkin">
               <Button variant="gold">Entrance Scanner</Button>
             </Link>
@@ -166,9 +284,19 @@ export default function AdminDashboard() {
                   placeholder="Scan QR or paste code..."
                   autoFocus
                 />
-                <Button type="submit" className="w-full">Check In Guest</Button>
+                <Button type="submit" className="w-full">
+                  Check In Guest
+                </Button>
                 {scanResult && (
-                  <p className={`text-center text-sm ${scanResult.startsWith("✓") ? "text-green-600" : scanResult.startsWith("⚠") ? "text-yellow-600" : "text-red-600"}`}>
+                  <p
+                    className={`text-center text-sm ${
+                      scanResult.startsWith("✓")
+                        ? "text-green-600"
+                        : scanResult.startsWith("⚠")
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                    }`}
+                  >
                     {scanResult}
                   </p>
                 )}
@@ -179,24 +307,57 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" /> Add Guest
+                <Users className="h-5 w-5" /> Add Invited Guest
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <p className="mb-4 text-sm text-gray-500">
+                For 1 guest: add name → View / Download → send the QR image. Or copy the full-site Entrance Card link.
+              </p>
               <form onSubmit={handleAddGuest} className="space-y-4">
                 <div>
                   <Label>Name</Label>
-                  <Input value={newGuest.name} onChange={(e) => setNewGuest({ ...newGuest, name: e.target.value })} required className="mt-1" />
+                  <Input
+                    value={newGuest.name}
+                    onChange={(e) => setNewGuest({ ...newGuest, name: e.target.value })}
+                    required
+                    className="mt-1"
+                  />
                 </div>
                 <div>
-                  <Label>Email</Label>
-                  <Input value={newGuest.email} onChange={(e) => setNewGuest({ ...newGuest, email: e.target.value })} className="mt-1" />
+                  <Label>Email (optional)</Label>
+                  <Input
+                    value={newGuest.email}
+                    onChange={(e) => setNewGuest({ ...newGuest, email: e.target.value })}
+                    className="mt-1"
+                  />
                 </div>
                 <div>
-                  <Label>Phone</Label>
-                  <Input value={newGuest.phone} onChange={(e) => setNewGuest({ ...newGuest, phone: e.target.value })} className="mt-1" />
+                  <Label>Phone (optional)</Label>
+                  <Input
+                    value={newGuest.phone}
+                    onChange={(e) => setNewGuest({ ...newGuest, phone: e.target.value })}
+                    className="mt-1"
+                  />
                 </div>
-                <Button type="submit" className="w-full">Add Guest</Button>
+                <Button type="submit" className="w-full">
+                  Add Guest + Generate Invite Link
+                </Button>
+                {addError && <p className="text-center text-sm text-red-600">{addError}</p>}
+                {lastCreatedCode && (
+                  <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-center text-sm text-green-800">
+                    Invite code:{" "}
+                    <span className="font-mono font-bold tracking-wider">{lastCreatedCode}</span>
+                    <button
+                      type="button"
+                      className="ml-2 inline-flex items-center gap-1 text-green-700 underline"
+                      onClick={() => copyText(personalInviteLink(lastCreatedCode), "new")}
+                    >
+                      {copiedId === "new" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                      Copy link
+                    </button>
+                  </div>
+                )}
               </form>
             </CardContent>
           </Card>
@@ -204,7 +365,59 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Guest List</CardTitle>
+            <CardTitle>Bulk import (~350 guests)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-3 text-sm text-gray-500">
+              Paste <strong>one name per line</strong> (or CSV with name in the first column). The system
+              creates each guest with a unique invite code + personal QR link. Then use{" "}
+              <strong>Copy all personal links</strong> (full site + Entrance Card) or download each QR to send.
+            </p>
+            <form onSubmit={handleBulkImport} className="space-y-4">
+              <textarea
+                value={bulkNames}
+                onChange={(e) => setBulkNames(e.target.value)}
+                rows={10}
+                placeholder={"Abebe Kebede\nAlmaz Desta\n...\n(up to 500 names)"}
+                className="w-full rounded-md border border-gold/30 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+              <Button type="submit" className="w-full" disabled={bulkLoading}>
+                {bulkLoading ? "Importing…" : "Import all names into database"}
+              </Button>
+              {bulkResult && (
+                <p
+                  className={`text-center text-sm ${
+                    bulkResult.startsWith("✓") ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {bulkResult}
+                </p>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-4">
+            <CardTitle>Guest List (invite codes)</CardTitle>
+            {guests.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => copyText(inviteListText, "bulk")}
+              >
+                {copiedId === "bulk" ? (
+                  <>
+                    <Check className="mr-1 h-4 w-4" /> Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-1 h-4 w-4" /> Copy all personal links
+                  </>
+                )}
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -212,17 +425,35 @@ export default function AdminDashboard() {
                 <thead>
                   <tr className="border-b border-gold/20 text-left">
                     <th className="pb-3 pr-4">Name</th>
-                    <th className="pb-3 pr-4">QR Code</th>
+                    <th className="pb-3 pr-4">Invite Code</th>
                     <th className="pb-3 pr-4">RSVP</th>
                     <th className="pb-3 pr-4">Status</th>
-                    <th className="pb-3">Invite Link</th>
+                    <th className="pb-3">Share QR</th>
                   </tr>
                 </thead>
                 <tbody>
                   {guests.map((guest) => (
                     <tr key={guest.id} className="border-b border-gold/10">
                       <td className="py-3 pr-4 font-medium">{guest.name}</td>
-                      <td className="py-3 pr-4 font-mono text-xs">{guest.qrCode}</td>
+                      <td className="py-3 pr-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-mono text-xs font-semibold tracking-wider text-wine">
+                            {guest.inviteCode}
+                          </span>
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 text-left text-xs text-gold hover:underline"
+                            onClick={() => copyText(personalInviteLink(guest.inviteCode), guest.id)}
+                          >
+                            {copiedId === guest.id ? (
+                              <Check className="h-3.5 w-3.5 text-green-600" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                            Copy Entrance Card link
+                          </button>
+                        </div>
+                      </td>
                       <td className="py-3 pr-4">
                         {guest.rsvp
                           ? guest.rsvp.attendance
@@ -231,27 +462,33 @@ export default function AdminDashboard() {
                           : "—"}
                       </td>
                       <td className="py-3 pr-4">
-                        <span className={`rounded-full px-2 py-1 text-xs ${
-                          guest.status === "CHECKED_IN" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-                        }`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${
+                            guest.status === "CHECKED_IN"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
                           {guest.status === "CHECKED_IN" ? "Checked In" : "Pending"}
                         </span>
                       </td>
                       <td className="py-3">
-                        <a
-                          href={`/invite/${coupleInfo.slug}?guest=${guest.id}`}
-                          target="_blank"
-                          className="text-gold hover:underline"
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setQrGuest(guest)}
                         >
-                          View
-                        </a>
+                          <QrCode className="mr-1 h-3.5 w-3.5" />
+                          View / Download
+                        </Button>
                       </td>
                     </tr>
                   ))}
                   {guests.length === 0 && (
                     <tr>
                       <td colSpan={5} className="py-8 text-center text-gray-400">
-                        No guests yet. Add guests or run the seed script.
+                        No guests yet. Add invited guests above (or run the seed script).
                       </td>
                     </tr>
                   )}
@@ -261,6 +498,10 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {qrGuest && (
+        <AdminGuestQrModal guest={qrGuest} onClose={() => setQrGuest(null)} />
+      )}
     </div>
   );
 }

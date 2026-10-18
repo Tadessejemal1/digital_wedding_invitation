@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
+import { coupleInfo } from "@/lib/images";
 
 export async function GET(request: Request) {
   const token = getAdminTokenFromCookie(request.headers.get("cookie"));
@@ -8,12 +9,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [totalGuests, checkedIn, rsvps, guestbookCount] = await Promise.all([
-    prisma.guest.count(),
-    prisma.guest.count({ where: { status: "CHECKED_IN" } }),
-    prisma.rsvp.findMany({ include: { guest: true } }),
-    prisma.guestbook.count(),
-  ]);
+  const [totalGuests, checkedIn, rsvps, guestbookCount, guestPhotoCount, couple] =
+    await Promise.all([
+      prisma.guest.count(),
+      prisma.guest.count({ where: { status: "CHECKED_IN" } }),
+      prisma.rsvp.findMany({ include: { guest: true } }),
+      prisma.guestbook.count(),
+      prisma.guestPhoto.count(),
+      prisma.couple.findUnique({
+        where: { slug: process.env.INVITE_SLUG || coupleInfo.slug },
+        select: { id: true },
+      }),
+    ]);
 
   const confirmed = rsvps.filter((r) => r.attendance).length;
   const declined = rsvps.filter((r) => !r.attendance).length;
@@ -24,6 +31,8 @@ export async function GET(request: Request) {
     confirmed,
     declined,
     guestbookCount,
+    guestPhotoCount,
+    coupleId: couple?.id || null,
     rsvps,
   });
 }

@@ -13,7 +13,7 @@ import {
   persistEnteredWithMusic,
 } from "@/lib/invite-unlock";
 
-const MUSIC_SRC = "/images/weeding.MP4";
+const MUSIC_SRC = "/Eden/document_5956099425905417707.mp4";
 
 export function MusicPlayer() {
   const t = useTranslations("music");

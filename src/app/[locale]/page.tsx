@@ -8,8 +8,9 @@ import { GallerySection } from "@/components/wedding/GallerySection";
 import { LocationSection } from "@/components/wedding/LocationSection";
 import { FamilySection } from "@/components/wedding/FamilySection";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
-// import { InvitationQrSection } from "@/components/wedding/InvitationQrSection";
+import { EntranceCardSection } from "@/components/wedding/EntranceCardSection";
 import { GuestbookSection } from "@/components/wedding/GuestbookSection";
+import { SharePhotoSection } from "@/components/wedding/SharePhotoSection";
 // import { GiftsSection } from "@/components/wedding/GiftsSection";
 import { Footer } from "@/components/wedding/Footer";
 import { WeddingPageShell } from "@/components/wedding/WeddingPageShell";
@@ -17,7 +18,7 @@ import { getDemoCouple } from "@/lib/demo-data";
 import { weddingImages, coupleInfo, getAllGalleryItems } from "@/lib/images";
 import { sortProgramItems, weddingProgram } from "@/lib/couple-program";
 import { VENUE_MAP_LINK } from "@/lib/maps";
-import { howTheyMetStory, journeyStory } from "@/lib/couple-story";
+import { howTheyMetStory, invitationMessageStory, journeyStory } from "@/lib/couple-story";
 
 async function getCouple() {
   try {
@@ -40,30 +41,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const couple = await getCouple();
   const data = couple || getDemoCouple();
 
-  // Keep family names in sync with current content (even if DB has older values)
-  data.groomFamily = "Mother: Simanesh Legese\nSister: Bizuayew Jemal";
-  data.brideFamily = "Mother: Dasash Fikadu\nSister: Enanu Kassie";
-
-  // Keep venue text in sync with current content
-  data.venueName = "Jambo Building";
-  data.venueAddress = "In front of Jambo Building, Addisu Gebeya, Addis Ababa, Ethiopia";
+  // Keep couple content in sync for Andinet & Eden (even if DB has older values)
+  data.groomName = coupleInfo.groomName;
+  data.brideName = coupleInfo.brideName;
+  data.groomFamily = "";
+  data.brideFamily = "";
+  data.venueName = "Abo Garden";
+  data.venueAddress = "Mekanisa Abo Square (Abo Garden), Addis Ababa, Ethiopia";
   data.howTheyMet = howTheyMetStory;
   data.journey = journeyStory;
-  data.contactPhone = "+251715664630 / +251985810221";
+  data.invitationMessage = invitationMessageStory;
+  data.weddingDate = new Date("2026-11-01T10:00:00.000Z") as unknown as typeof data.weddingDate;
+  data.contactPhone = "0911408338";
+  data.contactEmail = "Shimelsabera31@gmail.com";
 
-  // Keep program times in sync (even if DB has older values with "LT")
-  if (data.program) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (data as any).program = data.program.map((p: { title: string }) => {
-      const source = weddingProgram.find((item) => item.title === p.title);
-      return source ? { ...p, startTime: source.startTime, description: source.description } : p;
-    });
-  }
+  // Keep program in sync with the latest schedule (even if DB has older items)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (data as any).program = weddingProgram.map((item, index) => ({
+    id: `program-${index + 1}`,
+    title: item.title,
+    startTime: item.startTime,
+    description: item.description,
+  }));
 
   if (locale === "am") {
     const { amharicData } = await import("@/lib/amharic-data");
-    data.groomName = amharicData.groomName;
-    data.brideName = amharicData.brideName;
+    data.groomName = amharicData.groomFullName;
+    data.brideName = amharicData.brideFullName;
     data.groomBio = amharicData.groomBio;
     data.brideBio = amharicData.brideBio;
     data.howTheyMet = amharicData.howTheyMet;
@@ -75,6 +79,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     data.receptionAddress = amharicData.receptionAddress;
     data.groomFamily = amharicData.groomFamily;
     data.brideFamily = amharicData.brideFamily;
+    data.contactPhone = amharicData.coordinatorPhone;
+    data.contactEmail = amharicData.contactEmail;
 
     if (data.program) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,6 +99,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     }
   }
 
+  const showFamily = Boolean(data.brideFamily?.trim() || data.groomFamily?.trim());
+  const weddingDate = new Date(data.weddingDate);
+
   return (
     <WeddingPageShell
       requirePassword={false}
@@ -100,7 +109,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <HeroSection
           groomName={data.groomName}
           brideName={data.brideName}
-          weddingDate={new Date(data.weddingDate)}
+          weddingDate={weddingDate}
           coverImage={weddingImages.hero}
           requirePassword={false}
         />
@@ -118,7 +127,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         story={data.story}
       />
       <InvitationMessage message={data.invitationMessage} />
-      <CountdownSection targetDate={new Date(data.weddingDate)} />
+      <CountdownSection targetDate={weddingDate} />
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <ProgramSection items={sortProgramItems((data.program as any) || [])} />
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -128,21 +137,27 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         venueAddress={data.venueAddress}
         mapLink={VENUE_MAP_LINK}
       />
-      <FamilySection brideFamily={data.brideFamily} groomFamily={data.groomFamily} />
-      <RsvpSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
-      {/* <InvitationQrSection coupleId={data.id} slug={data.slug || coupleInfo.slug} /> */}
+      {showFamily && (
+        <FamilySection brideFamily={data.brideFamily} groomFamily={data.groomFamily} />
+      )}
+      <RsvpSection
+        coupleId={data.id}
+        slug={data.slug || coupleInfo.slug}
+        weddingDate={weddingDate.toISOString()}
+      />
+      <EntranceCardSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
       {/* <GiftsSection
         cbeAccount={data.cbeAccount}
         telebirr={data.telebirr}
         giftRegistry={data.giftRegistry}
       /> */}
       <GuestbookSection />
+      <SharePhotoSection coupleId={data.id} slug={data.slug || coupleInfo.slug} />
       <Footer
         groomName={data.groomName}
         brideName={data.brideName}
-        contactPhone={data.contactPhone}
-        contactPhones={["+251715664630", "+251985810221"]}
-        contactEmail={data.contactEmail}
+        coordinatorPhone={data.contactPhone || "0911408338"}
+        contactEmail={data.contactEmail || "Shimelsabera31@gmail.com"}
       />
     </WeddingPageShell>
   );

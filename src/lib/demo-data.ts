@@ -1,5 +1,5 @@
 import { weddingImages, coupleInfo } from "./images";
-import { howTheyMetStory, journeyStory } from "./couple-story";
+import { howTheyMetStory, invitationMessageStory, journeyStory } from "./couple-story";
 import { weddingProgram } from "./couple-program";
 import { VENUE_MAP_LINK } from "./maps";
 
@@ -14,26 +14,26 @@ export function getDemoCouple() {
     story: null,
     howTheyMet: howTheyMetStory,
     journey: journeyStory,
-    invitationMessage:
-      "With great joy and gratitude, we invite you to join us as we begin our new journey together. Your presence will make our celebration complete.",
-    weddingDate: "2026-07-26T10:00:00.000Z",
-    venueName: "Jambo Building",
-    venueAddress: "In front of Jambo Building, Addisu Gebeya, Addis Ababa, Ethiopia",
-    receptionName: "Tadesse's Parents Home",
-    receptionAddress: "Addis Ababa, Ethiopia",
+    invitationMessage: invitationMessageStory,
+    /** Sunday Tikimt 22, 2019 E.C. ≈ November 1, 2026 */
+    weddingDate: "2026-11-01T10:00:00.000Z",
+    venueName: "Abo Garden",
+    venueAddress: "Mekanisa Abo Square (Abo Garden), Addis Ababa, Ethiopia",
+    receptionName: "Abo Garden",
+    receptionAddress: "Mekanisa Abo Square, Addis Ababa, Ethiopia",
     mapLink: VENUE_MAP_LINK,
     receptionMapLink: VENUE_MAP_LINK,
     coverImage: weddingImages.hero,
-      invitePassword: null,
-    groomFamily: "Mother: Simanesh Legese\nSister: Bizuayew Jemal",
-    brideFamily: "Mother: Dasash Fikadu\nSister: Enanu Kassie",
-    cbeAccount: "1000123456789",
-    telebirr: "0911-234-567",
-    giftRegistry: "https://example.com/registry",
-    contactPhone: "+251715664630 / +251985810221",
-    contactEmail: "tadesse.hana@wedding.com",
-    socialInstagram: "https://instagram.com",
-    socialFacebook: "https://facebook.com",
+    invitePassword: null,
+    groomFamily: "",
+    brideFamily: "",
+    cbeAccount: null,
+    telebirr: null,
+    giftRegistry: null,
+    contactPhone: "0911408338",
+    contactEmail: "Shimelsabera31@gmail.com",
+    socialInstagram: null,
+    socialFacebook: null,
     program: weddingProgram.map((item, index) => ({
       id: String(index + 1),
       ...item,

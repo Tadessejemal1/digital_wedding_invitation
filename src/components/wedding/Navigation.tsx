@@ -6,7 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 
-const navKeys = ["home", "story", "program", "gallery", "location", "rsvp", "checkIn", "guestbook" /* "gifts" */] as const;
+const navKeys = [
+  "home",
+  "story",
+  "program",
+  "gallery",
+  "location",
+  "rsvp",
+  "guestbook",
+  "sharePhotos",
+] as const;
 
 export function Navigation() {
   const t = useTranslations("nav");
@@ -38,7 +47,7 @@ export function Navigation() {
               {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
             <a href="#home" className={`font-display text-lg sm:text-xl ${scrolled ? "text-wine" : "text-white"}`}>
-              T & H
+              A & E
             </a>
           </div>
 

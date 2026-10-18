@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { generateQrCode } from "@/lib/utils";
 import { resolveCoupleId } from "@/lib/couple";
 import { getDatabaseErrorMessage } from "@/lib/db-errors";
+import { generateInviteCode, generateQrCode } from "@/lib/utils";
 import { z } from "zod";
 
 const rsvpSchema = z.object({
@@ -12,11 +12,29 @@ const rsvpSchema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
   attending: z.boolean(),
-  guestCount: z.number().min(1).max(10),
-  plusOne: z.boolean(),
+  guestCount: z.number().min(1).max(10).optional().default(1),
+  plusOne: z.boolean().optional().default(false),
   dietaryNotes: z.string().optional(),
   message: z.string().optional(),
 });
+
+async function uniqueInviteCode() {
+  for (let i = 0; i < 20; i++) {
+    const inviteCode = generateInviteCode();
+    const exists = await prisma.guest.findUnique({ where: { inviteCode } });
+    if (!exists) return inviteCode;
+  }
+  throw new Error("Could not allocate invite code");
+}
+
+async function uniqueQrCode() {
+  for (let i = 0; i < 20; i++) {
+    const qrCode = generateQrCode();
+    const exists = await prisma.guest.findUnique({ where: { qrCode } });
+    if (!exists) return qrCode;
+  }
+  throw new Error("Could not allocate QR code");
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,25 +49,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const name = data.name.trim();
+
+    // Prefer matching a pre-invited guest by name (admin bulk list)
     let guest = await prisma.guest.findFirst({
       where: {
         coupleId,
-        OR: [
-          ...(data.email ? [{ email: data.email }] : []),
-          ...(data.phone ? [{ phone: data.phone }] : []),
-          { name: { equals: data.name, mode: "insensitive" as const } },
-        ],
+        name: { equals: name, mode: "insensitive" },
       },
+      orderBy: { invited: "desc" },
     });
 
-    if (!guest) {
+    if (guest) {
+      await prisma.guest.update({
+        where: { id: guest.id },
+        data: {
+          name,
+          email: data.email || guest.email,
+          phone: data.phone || guest.phone,
+          status: data.attending ? guest.status : "DECLINED",
+        },
+      });
+    } else {
+      // Open attendance: track the reply; no entrance QR without a personal invite link
       guest = await prisma.guest.create({
         data: {
           coupleId,
-          name: data.name,
+          name,
           email: data.email || null,
           phone: data.phone || null,
-          qrCode: generateQrCode(),
+          inviteCode: await uniqueInviteCode(),
+          qrCode: await uniqueQrCode(),
+          invited: false,
+          status: data.attending ? "PENDING" : "DECLINED",
         },
       });
     }
@@ -81,9 +113,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       guestId: guest.id,
-      qrCode: guest.qrCode,
-      status: guest.status,
-      slug: couple?.slug || process.env.INVITE_SLUG || "TADESSE-HANA",
+      status: data.attending ? guest.status : "DECLINED",
+      slug: couple?.slug || process.env.INVITE_SLUG || "ANDINET-EDEN",
+      // Entrance QR is only via personal /my-invite/[code] link from the hosts
+      qrAvailable: false,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

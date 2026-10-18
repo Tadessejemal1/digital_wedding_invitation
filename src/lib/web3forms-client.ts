@@ -34,7 +34,7 @@ export async function submitWeb3FormsEmail(input: SubmitInput): Promise<boolean>
         email: input.email || "noreply@web3forms.com",
         subject: input.subject,
         message: input.message,
-        from_name: "Tadesse & Hana Wedding",
+        from_name: "Andinet & Eden Wedding",
         form_type: input.formType,
         botcheck: false,
       }),

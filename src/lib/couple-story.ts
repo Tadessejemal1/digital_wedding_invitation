@@ -1,5 +1,8 @@
 export const howTheyMetStory =
-  "We first connected from a distance through calls and messages. After getting to know each other for about a year, we met in person about six years ago—and our love story began. ❤️";
+  "We were close friends for many years, but over time, our beautiful friendship blossomed into love. Today, the journey we’ve shared—built on mutual support and deep affection—has flourished, bringing us to a lasting marriage and a lifelong vow. 💕";
 
 export const journeyStory =
-  "Together through challenges, laughter, love, and blessings—we are ready for marriage.";
+  "Having walked together through love, challenges, joy, and blessings—we are now ready for marriage.";
+
+export const invitationMessageStory =
+  "It is with great honor that we invite you to attend our wedding ceremony. Your presence will bring even more joy to our special celebration.";

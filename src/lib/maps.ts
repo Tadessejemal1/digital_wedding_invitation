@@ -1,8 +1,8 @@
 const PLACEHOLDER_PATTERNS = ["1234567890", "0x0%3A0x0", "0x0:0x0"];
 
-/** Venue location: 9.057490, 38.737534 */
+/** Abo Garden / Mekanisa Abo Square — 8.9816048, 38.7327783 */
 export const VENUE_MAP_LINK =
-  "https://maps.google.com/maps?q=9.057490,38.737534&ll=9.057490,38.737534&z=16";
+  "https://www.google.com/maps/place/8%C2%B058'53.8%22N+38%C2%B043'58.0%22E/@8.9816048,38.7302034,17z/data=!3m1!4b1!4m4!3m3!8m2!3d8.9816048!4d38.7327783?entry=ttu";
 
 /** @deprecated Use VENUE_MAP_LINK */
 export const HOLY_TRINITY_MAP_LINK = VENUE_MAP_LINK;

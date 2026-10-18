@@ -32,6 +32,10 @@ export function HeroSection({
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const isLocked = (requirePassword || gateRequired) && !unlocked;
+  const dateLabel =
+    locale === "am"
+      ? "እሁድ ጥቅምት 22 ቀን 2019 ዓ.ም."
+      : formatWeddingDate(weddingDate, locale);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,7 +158,7 @@ export function HeroSection({
             transition={{ duration: 1, delay: 1.2 }}
             className="font-display text-lg tracking-wide text-gold-light drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] sm:text-2xl md:text-3xl"
           >
-            {formatWeddingDate(weddingDate, locale)}
+            {dateLabel}
           </motion.div>
         </div>
       )}

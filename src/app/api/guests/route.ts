@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { generateQrCode } from "@/lib/utils";
+import { generateInviteCode, generateQrCode } from "@/lib/utils";
 import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
+import { resolveCoupleId } from "@/lib/couple";
+import { coupleInfo } from "@/lib/images";
 import { z } from "zod";
 
 const guestSchema = z.object({
-  coupleId: z.string(),
+  coupleId: z.string().optional(),
+  slug: z.string().optional(),
   name: z.string().min(1),
   phone: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
@@ -21,13 +24,33 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = guestSchema.parse(body);
 
+    const coupleId =
+      (await resolveCoupleId(data.coupleId, data.slug || coupleInfo.slug)) || data.coupleId;
+
+    if (!coupleId || coupleId === "demo-couple") {
+      return NextResponse.json(
+        { error: "Wedding couple not found. Seed the database first." },
+        { status: 404 }
+      );
+    }
+
+    let inviteCode = generateInviteCode();
+    // Ensure uniqueness
+    for (let i = 0; i < 5; i++) {
+      const exists = await prisma.guest.findUnique({ where: { inviteCode } });
+      if (!exists) break;
+      inviteCode = generateInviteCode();
+    }
+
     const guest = await prisma.guest.create({
       data: {
-        coupleId: data.coupleId,
+        coupleId,
         name: data.name,
         phone: data.phone || null,
         email: data.email || null,
+        inviteCode,
         qrCode: generateQrCode(),
+        invited: true,
       },
     });
 

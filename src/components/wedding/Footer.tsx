@@ -3,30 +3,24 @@
 import { useTranslations } from "next-intl";
 import { Phone, Mail } from "lucide-react";
 
+const DEVELOPER_PHONE = "0979113638";
+const COORDINATOR_PHONE = "0911408338";
+
 interface FooterProps {
   groomName: string;
   brideName: string;
-  contactPhone?: string | null;
-  contactPhones?: string[];
   contactEmail?: string | null;
+  coordinatorPhone?: string | null;
 }
 
 export function Footer({
   groomName,
   brideName,
-  contactPhone,
-  contactPhones,
   contactEmail,
+  coordinatorPhone = COORDINATOR_PHONE,
 }: FooterProps) {
   const t = useTranslations("footer");
   const year = new Date().getFullYear();
-
-  const phones =
-    contactPhones && contactPhones.length > 0
-      ? contactPhones
-      : contactPhone
-        ? [contactPhone]
-        : [];
 
   return (
     <footer className="bg-wine py-12 text-white">
@@ -36,19 +30,20 @@ export function Footer({
         </h3>
         <div className="decorative-line my-6 via-gold-light" />
 
-        {(phones.length > 0 || contactEmail) && (
+        {(coordinatorPhone || contactEmail) && (
           <div className="mb-6">
-            <p className="mb-3 text-sm uppercase tracking-widest text-gold-light">{t("contact")}</p>
+            <p className="mb-3 text-sm uppercase tracking-widest text-gold-light">
+              {t("coordinatorPhone")}
+            </p>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-              {phones.map((phone) => (
+              {coordinatorPhone && (
                 <a
-                  key={phone}
-                  href={`tel:${phone.replace(/\s/g, "")}`}
+                  href={`tel:${coordinatorPhone.replace(/\s/g, "")}`}
                   className="flex items-center gap-2 hover:text-gold-light"
                 >
-                  <Phone className="h-4 w-4" /> {phone}
+                  <Phone className="h-4 w-4" /> {coordinatorPhone}
                 </a>
-              ))}
+              )}
               {contactEmail && (
                 <a href={`mailto:${contactEmail}`} className="flex items-center gap-2 hover:text-gold-light">
                   <Mail className="h-4 w-4" /> {contactEmail}
@@ -59,7 +54,10 @@ export function Footer({
         )}
 
         <p className="text-sm text-white/60">
-          &copy; {year} {t("copyright")}
+          {t("builtBy")} {year} {t("copyright")}{" "}
+          <a href={`tel:${DEVELOPER_PHONE}`} className="hover:text-gold-light">
+            {DEVELOPER_PHONE}
+          </a>
         </p>
       </div>
     </footer>

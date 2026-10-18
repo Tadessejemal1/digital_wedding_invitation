@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["wedding"]
+  schemas  = ["weedings"]
 }
 
 model Couple {
@@ -39,12 +39,13 @@ model Couple {
   socialFacebook     String?  @map("social_facebook")
   createdAt          DateTime @default(now()) @map("created_at")
 
-  gallery Gallery[]
-  program Program[]
-  guests  Guest[]
+  gallery     Gallery[]
+  program     Program[]
+  guests      Guest[]
+  guestPhotos GuestPhoto[]
 
   @@map("couples")
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 model Gallery {
@@ -58,7 +59,7 @@ model Gallery {
   couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 
   @@map("gallery")
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 model Program {
@@ -71,7 +72,7 @@ model Program {
   couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
 
   @@map("program")
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 enum GuestStatus {
@@ -79,7 +80,7 @@ enum GuestStatus {
   CHECKED_IN
   DECLINED
 
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 model Guest {
@@ -88,7 +89,12 @@ model Guest {
   name        String
   phone       String?
   email       String?
+  /** Personal link segment: /my-invite/[inviteCode] — entrance QR only. */
+  inviteCode  String      @unique @map("invite_code")
+  /** Entrance QR payload id — shown only via personal invite link. */
   qrCode      String      @unique @map("qr_code")
+  /** Admin-listed guests (invited=true) may open entrance QR via personal link. */
+  invited     Boolean     @default(true)
   status      GuestStatus @default(PENDING)
   checkedInAt DateTime?   @map("checked_in_at")
 
@@ -96,7 +102,7 @@ model Guest {
   rsvp   Rsvp?
 
   @@map("guests")
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 model Rsvp {
@@ -112,7 +118,7 @@ model Rsvp {
   guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
 
   @@map("rsvp")
-  @@schema("wedding")
+  @@schema("weedings")
 }
 
 model Guestbook {
@@ -122,5 +128,23 @@ model Guestbook {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("guestbook")
-  @@schema("wedding")
+  @@schema("weedings")
+}
+
+/** Guest-shared photos — visible to admin only. Cap: 60 total. */
+model GuestPhoto {
+  id         String   @id @default(cuid())
+  coupleId   String?  @map("couple_id")
+  guestName  String   @map("guest_name")
+  fileName   String   @map("file_name")
+  mimeType   String   @map("mime_type")
+  sizeBytes  Int      @map("size_bytes")
+  /** Image bytes stored in DB so uploads survive serverless deploys. */
+  data       Bytes
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  couple Couple? @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+
+  @@map("guest_photos")
+  @@schema("weedings")
 }

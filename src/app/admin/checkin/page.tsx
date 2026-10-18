@@ -35,10 +35,12 @@ export default function CheckInScannerPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setScanResult(`✓ ${data.guest.name} checked in`);
+        setScanResult(`✓ ${data.guest.name} checked in — invitation used for entrance`);
         setScanInput("");
       } else if (data.duplicate) {
-        setScanResult(`⚠ ${data.guest.name} already checked in`);
+        setScanResult(`⚠ ${data.guest.name} already checked in — one invitation, one entrance only`);
+      } else if (data.notAttending) {
+        setScanResult(`✗ ${data.guest?.name || "Guest"} did not confirm attendance`);
       } else {
         setScanResult(`✗ ${data.error || "Invalid invitation QR"}`);
       }
@@ -72,7 +74,7 @@ export default function CheckInScannerPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-4 text-sm text-gray-500">
-              Scan the guest entrance QR code only. This is not for gift payments.
+              One invitation = one entrance. Scan once to mark the guest checked in. A second scan will be rejected.
             </p>
             <form onSubmit={handleScan} className="space-y-4">
               <Input

@@ -1,54 +1,53 @@
 export const amharicData = {
-  groomName: "ታደሰ",
-  brideName: "ሀና",
+  groomName: "አንድነት",
+  brideName: "ኤደን",
+  groomFullName: "አንድነት አያሌው",
+  brideFullName: "ኤደን ሽመልስ",
+  /** እሁድ ጥቅምት 22 ቀን 2019 ዓ.ም. ≈ Sunday, November 1, 2026 */
+  ethiopianDate: "እሁድ ጥቅምት 22 ቀን 2019 ዓ.ም.",
   groomBio: "በእምነት፣ በቤተሰብ እና በኢትዮጵያዊ ባህል ላይ የተመሰረተ፣ ሞቅ ያለ ልብ ያለው ታማኝ አጋር።",
   brideBio: "በምትገባበት ቦታ ሁሉ ፈገግታዋ ብርሃን የሚፈነጥቅ፣ ጸጋ የተሞላች እና ደስተኛ ነፍስ።",
-  howTheyMet: "በርቀት በስልክ እና በመልእክት ተገናኘን። ለአንድ ዓመት ያህል ከተዋወቅን በኋላ፣ ከስድስት ዓመት በፊት በአካል ተገናኘን፣ ፍቅራችንም ተጀመረ። ❤️",
-  journey: "በፈተና፣ በሳቅ፣ በፍቅር እና በበረከት አብረን—ለጋብቻ ዝግጁ ነን።",
-  invitationMessage: "በታላቅ ደስታ እና ምስጋና፣ የጋብቻ ስነ-ስርዓታችንን ለመከበር በደስታ እንጋብዛችኋለን። የእናንተ መገኘት በዓላችንን የተሟላ ያደርገዋል።",
-  venueName: "ጃምቦ ህንፃ",
-  venueAddress: "በጃምቦ ህንፃ ፊት ለፊት፣ አዲሱ ገበያ፣ አዲስ አበባ፣ ኢትዮጵያ",
-  receptionName: "የታደሰ ወላጆች ቤት",
-  receptionAddress: "አዲስ አበባ፣ ኢትዮጵያ",
-  groomFamily: "እናት፡ ስማነሽ ለገሰ\nእህት፡ ብዙአየው ጀማል",
-  brideFamily: "እናት፡ ዳሳሽ ፍቃዱ\nእህት፡ እንኑ ካሲ",
+  howTheyMet:
+    "ለረጅም አመታት የቅርብ ጓደኛሞች ነበርን፤ በሂደት ግን ያ ውብ ጓደኝነታችን አድጎ ወደ ፍቅር ተቀየረ። ዛሬ ደግሞ እርስ በርስ በመደጋገፍና በመፈቃቀር የተጓዝንበት መንገድ አምሮና አብቦ፣ ይኸው ለዘላቂ ትዳርና ለዕድሜ ልክ ቃል ኪዳን አበቃን። 💕",
+  journey: "በፍቅር ፣ በፈተና፣ በደስታ እና በበረከት አብረን ተጉዘን—ለጋብቻ ዝግጁ ሆነናል።",
+  invitationMessage:
+    "በታላቅ አክብሮት የጋብቻ ሥነ-ሥርዓታችንን እንዲታደሙ እንጋብዝዎታለን። የእርስዎ መገኘት በበዓላችን ላይ ደስታን ይጨምራል።",
+  venueName: "አቦ ጋርደን",
+  venueAddress: "መካኒሳ አቦ አደባባዩ ላይ (አቦ ጋርደን)፣ አዲስ አበባ፣ ኢትዮጵያ",
+  receptionName: "አቦ ጋርደን",
+  receptionAddress: "መካኒሳ አቦ አደባባይ፣ አዲስ አበባ፣ ኢትዮጵያ",
+  groomFamily: "",
+  brideFamily: "",
+  coordinatorPhone: "0911408338",
+  contactEmail: "Shimelsabera31@gmail.com",
   program: {
-    "Bridal House": {
-      title: "የሙሽሪት ቤት",
-      startTime: "06:00 (ከሰዓት)",
-      description: "ክብረ በዓሉ በሙሽሪት ቤት ይጀምራል።"
+    "Bridal & Groom House": {
+      title: "የሙሽራ እና የሙሽሪት ቤት",
+      startTime: "04:00 – 06:00 (ጠዋት/ከሰዓት)",
+      description: "ክብረ በዓሉ በሙሽራ እና በሙሽሪት ቤት ይጀምራል።"
     },
-    "Lunch Ceremony": {
-      title: "የምሳ ፕሮግራም",
-      startTime: "07:00 (ከሰዓት)",
-      description: "የምሳ ፕሮግራም ከቤተሰብ እና ከእንግዶች ጋር።"
+    "Move to Abo Garden": {
+      title: "ወደ አቦ ጋርደን",
+      startTime: "08:00 (ከሰዓት)",
+      description: "እንግዶች ወደ አቦ ጋርደን ያመራሉ።"
+    },
+    "Abo Garden Dinner Program": {
+      title: "የአቦ ጋርደን የእራት ፕሮግራም",
+      startTime: "12:00 (ማታ)",
+      description: "የእራት ፕሮግራም በአቦ ጋርደን ከቤተሰብ እና ከእንግዶች ጋር።"
     },
     "Go to Stay House": {
       title: "ወደ ማረፊያ ቤት",
-      startTime: "01:00 (ማታ)",
+      startTime: "ከእራት በኋላ",
       description: "ሙሽሮቹ ወደ ማረፊያ ቤታቸው ያመራሉ።"
     }
   },
   galleryCaptions: {
-    "Together in white": "አብረን በነጭ",
-    "A quiet moment": "ጸጥ ያለ ጊዜ",
-    "Love and tenderness": "ፍቅር እና ርህራሄ",
-    "In traditional attire": "በባህላዊ ልብስ",
-    "Heritage outdoors": "ባህላዊ በውጭ",
-    "Traditional beauty": "ባህላዊ ውበት",
-    "Heritage portrait": "ባህላዊ ፎቶ",
-    "Our heritage together": "ባህላችን አብረን",
+    "Together": "አብረን",
+    "Our promise": "ቃል ኪዳናችን",
     "Side by side": "ጎን ለጎን",
-    "Walking into forever": "ወደ ዘላለም",
-    "Eyes only for each other": "ዓይናችን እርስ በርስ",
-    "Parkside portrait": "በፓርክ",
-    "Twilight together": "በማታ ብርሃን",
-    "By the fountains": "በፏፏቴዎች አጠገብ",
-    "Blue hour": "ሰማያዊ ሰዓት",
-    "Sparkling night": "ብልጭ ያለ ማታ",
-    "Under our flag": "ከባንዲራችን ስር",
-    "Nighttime celebration": "የማታ በዓል",
-    "Night smiles": "የማታ ፈገግታ",
-    "Close and joyful": "ቅርብ እና ደስተኛ"
+    "Joyful moments": "ደስተኛ ጊዜያት",
+    "With love": "በፍቅር",
+    "Forever starts here": "ዘላለም እዚህ ይጀምራል"
   }
 };

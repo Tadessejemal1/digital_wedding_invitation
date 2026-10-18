@@ -62,6 +62,7 @@ export function GuestQrCard({
       </div>
 
       <p className="font-serif text-sm text-gray-600">{t("scanAtEntrance")}</p>
+      <p className="mt-1 text-xs font-medium text-wine/80">{t("oneEntrance")}</p>
       <p className="mt-2 text-xs text-gray-400">{t("notForGifts")}</p>
 
       <div

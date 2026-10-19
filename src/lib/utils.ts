@@ -61,6 +61,22 @@ export function parseEntranceTicketNumber(code: string): number | null {
   return n;
 }
 
+/** Sort key for invite codes like EDENAND12R-01 … EDENAND12R-340 (numeric, not text). */
+export function inviteCodeSortValue(code: string): number {
+  const match = code.trim().toUpperCase().match(/-(\d+)$/);
+  if (match) {
+    const n = Number(match[1]);
+    if (Number.isFinite(n)) return n;
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
+
+export function sortByInviteCode<T extends { inviteCode: string }>(items: T[]): T[] {
+  return [...items].sort(
+    (a, b) => inviteCodeSortValue(a.inviteCode) - inviteCodeSortValue(b.inviteCode)
+  );
+}
+
 /** @deprecated Prefer formatEntranceTicket — kept for rare fallback IDs. */
 export function generateQrCode(): string {
   return randomCode(8);

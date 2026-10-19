@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { resolveCoupleId } from "@/lib/couple";
 import { allocateEntranceTicket } from "@/lib/entrance-tickets";
 import { coupleInfo } from "@/lib/images";
-import { formatEntranceTicket } from "@/lib/utils";
+import { formatEntranceTicket, sortByInviteCode } from "@/lib/utils";
 import { z } from "zod";
 
 const guestSchema = z.object({
@@ -54,8 +54,7 @@ export async function GET(request: NextRequest) {
   const guests = await prisma.guest.findMany({
     where: coupleId ? { coupleId } : undefined,
     include: { rsvp: true },
-    orderBy: { inviteCode: "asc" },
   });
 
-  return NextResponse.json(guests);
+  return NextResponse.json(sortByInviteCode(guests));
 }

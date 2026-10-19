@@ -17,6 +17,7 @@ import {
   Download,
 } from "lucide-react";
 import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
+import { sortByInviteCode } from "@/lib/utils";
 
 interface Analytics {
   totalGuests: number;
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
       if (a.coupleId) setCoupleId(a.coupleId);
     }
     if (guestsRes.ok) {
-      const guestList = await guestsRes.json();
+      const guestList = sortByInviteCode(await guestsRes.json());
       setGuests(guestList);
       if (guestList.length > 0 && guestList[0].coupleId) {
         setCoupleId(guestList[0].coupleId);

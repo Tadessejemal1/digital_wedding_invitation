@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { parseQrPayload } from "@/lib/qr";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,15 +8,11 @@ export async function POST(request: NextRequest) {
     let qrCode = typeof body.qrCode === "string" ? body.qrCode.trim() : "";
     let guestId = typeof body.guestId === "string" ? body.guestId.trim() : "";
 
-    // Support raw QR JSON payload: { guestId, qrCode, type: "wedding-checkin" }
-    if (qrCode.startsWith("{")) {
-      try {
-        const parsed = JSON.parse(qrCode);
-        if (parsed.qrCode) qrCode = String(parsed.qrCode).trim();
-        if (parsed.guestId) guestId = String(parsed.guestId).trim();
-      } catch {
-        // keep as plain string
-      }
+    // Support check-in URL, legacy JSON, or plain code
+    if (qrCode) {
+      const parsed = parseQrPayload(qrCode);
+      if (parsed.qrCode) qrCode = parsed.qrCode;
+      if (parsed.guestId) guestId = parsed.guestId;
     }
 
     const guest = await prisma.guest.findFirst({

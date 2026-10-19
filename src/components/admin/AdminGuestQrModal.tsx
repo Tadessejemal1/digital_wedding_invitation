@@ -29,14 +29,14 @@ export function AdminGuestQrModal({ guest, onClose }: AdminGuestQrModalProps) {
 
   useEffect(() => {
     let cancelled = false;
-    const payload = getGuestQrPayload(guest.id, guest.qrCode);
+    const payload = getGuestQrPayload(guest.id, guest.qrCode, origin);
     generateQrDataUrl(payload).then((url) => {
       if (!cancelled) setQrDataUrl(url);
     });
     return () => {
       cancelled = true;
     };
-  }, [guest.id, guest.qrCode]);
+  }, [guest.id, guest.qrCode, origin]);
 
   const copyLink = async () => {
     try {

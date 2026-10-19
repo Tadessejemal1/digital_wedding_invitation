@@ -27,7 +27,11 @@ export function GuestQrCard({
 
   useEffect(() => {
     let cancelled = false;
-    const payload = getGuestQrPayload(guestId, qrCode);
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin.replace(/\/$/, "")
+        : undefined;
+    const payload = getGuestQrPayload(guestId, qrCode, origin);
     generateQrDataUrl(payload).then((url) => {
       if (!cancelled) setQrDataUrl(url);
     });

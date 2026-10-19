@@ -17,6 +17,7 @@ import {
   Download,
 } from "lucide-react";
 import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
+import { parseQrPayload } from "@/lib/qr";
 import { sortByInviteCode } from "@/lib/utils";
 
 interface Analytics {
@@ -95,18 +96,12 @@ export default function AdminDashboard() {
     e.preventDefault();
     setScanResult("");
     try {
-      let qrCode = scanInput.trim();
-      try {
-        const parsed = JSON.parse(scanInput);
-        if (parsed.qrCode) qrCode = parsed.qrCode;
-      } catch {
-        /* plain QR code string */
-      }
+      const { qrCode, guestId } = parseQrPayload(scanInput);
 
       const res = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrCode }),
+        body: JSON.stringify({ qrCode, guestId }),
       });
       const data = await res.json();
 

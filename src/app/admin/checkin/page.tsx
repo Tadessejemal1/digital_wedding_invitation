@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, QrCode, XCircle } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, QrCode, XCircle } from "lucide-react";
+import { parseQrPayload } from "@/lib/qr";
 
 type ScanKind = "success" | "duplicate" | "error" | "";
+
+const CAMERA_ELEMENT_ID = "entrance-qr-reader";
 
 export default function CheckInScannerPage() {
   const [scanInput, setScanInput] = useState("");
@@ -14,35 +18,40 @@ export default function CheckInScannerPage() {
   const [scanKind, setScanKind] = useState<ScanKind>("");
   const [guestLabel, setGuestLabel] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cameraError, setCameraError] = useState("");
+  const [cameraReady, setCameraReady] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
+
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const processingRef = useRef(false);
+  const lastCodeRef = useRef("");
+  const lastScanAtRef = useRef(0);
+  const linkBootstrappedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [scanKind]);
+  const processCheckIn = useCallback(async (raw: string) => {
+    const now = Date.now();
+    const { qrCode, guestId } = parseQrPayload(raw);
+    if (!qrCode && !guestId) return;
 
-  const resetForNextScan = () => {
-    setScanInput("");
-    window.setTimeout(() => inputRef.current?.focus(), 50);
-  };
+    const dedupeKey = qrCode || guestId || "";
+    // Ignore rapid duplicate camera frames for the same code
+    if (
+      processingRef.current ||
+      (dedupeKey === lastCodeRef.current && now - lastScanAtRef.current < 4000)
+    ) {
+      return;
+    }
 
-  const handleScan = async (e: React.FormEvent) => {
-    e.preventDefault();
+    processingRef.current = true;
+    lastCodeRef.current = dedupeKey;
+    lastScanAtRef.current = now;
+    setLoading(true);
     setScanResult("");
     setScanKind("");
     setGuestLabel("");
-    setLoading(true);
 
     try {
-      let qrCode = scanInput.trim();
-      let guestId: string | undefined;
-      try {
-        const parsed = JSON.parse(scanInput);
-        if (parsed.qrCode) qrCode = String(parsed.qrCode);
-        if (parsed.guestId) guestId = String(parsed.guestId);
-      } catch {
-        /* plain code */
-      }
-
       const res = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,65 +64,149 @@ export default function CheckInScannerPage() {
         setScanKind("success");
         setGuestLabel(codeLabel);
         setScanResult("Checked in successfully");
-        resetForNextScan();
       } else if (data.duplicate) {
         setScanKind("duplicate");
         setGuestLabel(codeLabel);
         setScanResult("Already used — QR rejected");
-        resetForNextScan();
       } else if (data.notAttending) {
         setScanKind("error");
         setGuestLabel(codeLabel);
         setScanResult(data.error || "Entrance not allowed");
-        resetForNextScan();
       } else {
         setScanKind("error");
         setGuestLabel(codeLabel);
         setScanResult(data.error || "Invalid invitation QR");
-        resetForNextScan();
+      }
+      setScanInput("");
+
+      // Clean ?qr= from address bar after phone-camera deep link
+      if (typeof window !== "undefined" && window.location.search.includes("qr=")) {
+        window.history.replaceState({}, "", "/admin/checkin");
       }
     } catch {
       setScanKind("error");
       setScanResult("Network error");
     } finally {
       setLoading(false);
+      processingRef.current = false;
     }
+  }, []);
+
+  // Phone Camera app opens QR link → auto check-in + show result
+  useEffect(() => {
+    if (linkBootstrappedRef.current || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const qr = params.get("qr");
+    const g = params.get("g");
+    if (!qr && !g) return;
+    linkBootstrappedRef.current = true;
+    void processCheckIn(window.location.href);
+  }, [processCheckIn]);
+
+  useEffect(() => {
+    if (manualMode) return;
+
+    let cancelled = false;
+    const scanner = new Html5Qrcode(CAMERA_ELEMENT_ID);
+    scannerRef.current = scanner;
+
+    const start = async () => {
+      try {
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 8,
+            qrbox: (viewW, viewH) => {
+              const side = Math.min(Math.floor(viewW * 0.75), Math.floor(viewH * 0.55), 280);
+              return { width: side, height: side };
+            },
+            aspectRatio: 1.333,
+          },
+          (decoded) => {
+            void processCheckIn(decoded);
+          },
+          () => {
+            /* ignore frame-level "not found" */
+          }
+        );
+        if (!cancelled) {
+          setCameraReady(true);
+          setCameraError("");
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setCameraReady(false);
+          setCameraError(
+            err instanceof Error
+              ? err.message
+              : "Camera unavailable. Allow camera permission or use manual entry."
+          );
+          setManualMode(true);
+        }
+      }
+    };
+
+    void start();
+
+    return () => {
+      cancelled = true;
+      const current = scannerRef.current;
+      scannerRef.current = null;
+      if (current?.isScanning) {
+        void current.stop().catch(() => undefined);
+      }
+      try {
+        current?.clear();
+      } catch {
+        // ignore
+      }
+    };
+  }, [manualMode, processCheckIn]);
+
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scanInput.trim()) return;
+    await processCheckIn(scanInput);
+    window.setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-wine p-4">
-      <div className="mx-auto max-w-lg">
-        <h1 className="mb-6 font-display text-2xl text-white">Entrance Scanner</h1>
+      <div className="mx-auto max-w-lg space-y-4">
+        <h1 className="font-display text-2xl text-white">Entrance Scanner</h1>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-wine">
-              <QrCode className="h-5 w-5" /> Scan Invitation QR
+              <Camera className="h-5 w-5" /> Point camera at invitation QR
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-gray-500">
-              One QR = one entrance. First scan succeeds and updates status. Scanning again is
-              rejected.
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Works both ways: open this page and scan with the camera, or scan the QR with the phone
+              Camera app (opens this page and shows the result). One QR = one entrance.
             </p>
-            <form onSubmit={handleScan} className="space-y-4">
-              <Input
-                ref={inputRef}
-                value={scanInput}
-                onChange={(e) => setScanInput(e.target.value)}
-                placeholder="Scan QR or paste invitation code..."
-                autoFocus
-                className="text-lg"
-                disabled={loading}
-              />
-              <Button type="submit" className="w-full" size="lg" disabled={loading || !scanInput.trim()}>
-                {loading ? "Checking..." : "Check In Guest"}
-              </Button>
-            </form>
+
+            {!manualMode && (
+              <div className="overflow-hidden rounded-xl border border-gold/30 bg-black">
+                <div id={CAMERA_ELEMENT_ID} className="min-h-[260px] w-full" />
+                {!cameraReady && !cameraError && (
+                  <p className="p-4 text-center text-sm text-white/70">Starting camera…</p>
+                )}
+              </div>
+            )}
+
+            {cameraError && (
+              <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">{cameraError}</p>
+            )}
+
+            {loading && (
+              <p className="text-center text-sm font-medium text-wine">Checking invitation…</p>
+            )}
 
             {scanKind && (
               <div
-                className={`mt-6 flex flex-col items-center rounded-2xl p-6 text-center ${
+                className={`flex flex-col items-center rounded-2xl p-6 text-center ${
                   scanKind === "success"
                     ? "bg-green-50 text-green-700"
                     : scanKind === "duplicate"
@@ -131,9 +224,7 @@ export default function CheckInScannerPage() {
                   <XCircle className="mb-3 h-16 w-16 text-red-600" strokeWidth={1.75} />
                 )}
                 <p className="font-display text-2xl">{scanResult}</p>
-                {guestLabel && (
-                  <p className="mt-2 font-mono text-sm opacity-80">{guestLabel}</p>
-                )}
+                {guestLabel && <p className="mt-2 font-mono text-sm opacity-80">{guestLabel}</p>}
                 {scanKind === "success" && (
                   <p className="mt-3 text-sm text-green-700/80">Status updated to Checked In</p>
                 )}
@@ -143,6 +234,50 @@ export default function CheckInScannerPage() {
                   </p>
                 )}
               </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={manualMode ? "outline" : "gold"}
+                className="flex-1"
+                onClick={() => {
+                  setManualMode(false);
+                  setCameraError("");
+                }}
+              >
+                <Camera className="mr-1 h-4 w-4" /> Camera
+              </Button>
+              <Button
+                type="button"
+                variant={manualMode ? "gold" : "outline"}
+                className="flex-1"
+                onClick={() => setManualMode(true)}
+              >
+                <QrCode className="mr-1 h-4 w-4" /> Manual
+              </Button>
+            </div>
+
+            {manualMode && (
+              <form onSubmit={handleManualSubmit} className="space-y-3">
+                <Input
+                  ref={inputRef}
+                  value={scanInput}
+                  onChange={(e) => setScanInput(e.target.value)}
+                  placeholder="Paste invitation code..."
+                  className="text-lg"
+                  disabled={loading}
+                  autoFocus
+                />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={loading || !scanInput.trim()}
+                >
+                  {loading ? "Checking..." : "Check In Guest"}
+                </Button>
+              </form>
             )}
           </CardContent>
         </Card>

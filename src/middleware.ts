@@ -4,6 +4,10 @@ import { routing } from "./i18n/routing";
 export default createMiddleware(routing);
 
 export const config = {
-  // Match all paths except API, Next internals, and static files
-  matcher: ["/", "/(am|en)/:path*", "/((?!api|_next|_vercel|.*\\..*).*)"],
+  // Do NOT run i18n on /admin, /api, /invite — those live outside [locale]
+  matcher: [
+    "/",
+    "/(am|en)/:path*",
+    "/((?!api|admin|invite|_next|_vercel|.*\\..*).*)",
+  ],
 };

@@ -60,19 +60,16 @@ export function HeroSection({
         isLocked ? "justify-center" : "justify-end"
       }`}
     >
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Matching soft background (fills edges when zoomed out) */}
-        <Image
-          src={coverImage || "/Eden/DSC05073-Recovered.jpg"}
-          alt=""
-          fill
-          priority
+      <div className="absolute inset-0 overflow-hidden bg-[#2a1a1a]">
+        {/* Soft blurred fill — CSS only, no second network download */}
+        <div
+          className="absolute inset-0 scale-110 bg-cover bg-center brightness-110 blur-[28px]"
+          style={{
+            backgroundImage: `url(${coverImage || "/Eden/DSC05073-Recovered.jpg"})`,
+          }}
           aria-hidden
-          className="object-cover object-center brightness-110"
-          sizes="100vw"
-          style={{ filter: "blur(28px)", transform: "scale(1.2)" }}
         />
-        {/* Main photo — wider scale, slightly raised above invite text */}
+        {/* Main hero photo — single priority load */}
         <Image
           src={coverImage || "/Eden/DSC05073-Recovered.jpg"}
           alt={`${groomName} & ${brideName}`}

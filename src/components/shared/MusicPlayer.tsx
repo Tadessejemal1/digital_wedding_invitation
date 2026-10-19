@@ -154,7 +154,7 @@ export function MusicPlayer() {
       <audio
         ref={mediaRef}
         loop
-        preload="auto"
+        preload="metadata"
         className="pointer-events-none fixed h-px w-px opacity-0"
         src={MUSIC_SRC}
       />

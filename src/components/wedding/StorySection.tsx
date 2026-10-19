@@ -35,8 +35,8 @@ function CouplePortrait({
           src={image}
           alt={name}
           fill
-          quality={95}
-          priority
+          quality={90}
+          loading="lazy"
           className="object-cover object-center"
           sizes="(max-width: 768px) 100vw, 50vw"
         />

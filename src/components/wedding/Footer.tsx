@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Phone, Mail } from "lucide-react";
 
@@ -60,9 +61,12 @@ export function Footer({
           </a>
         </p>
         <p className="mt-4">
-          <a href="/admin" className="text-xs text-white/40 underline-offset-2 hover:text-gold-light hover:underline">
+          <Link
+            href="/admin"
+            className="text-xs text-white/40 underline-offset-2 hover:text-gold-light hover:underline"
+          >
             Admin
-          </a>
+          </Link>
         </p>
       </div>
     </footer>

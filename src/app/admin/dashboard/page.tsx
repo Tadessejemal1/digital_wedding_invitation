@@ -111,13 +111,17 @@ export default function AdminDashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        setScanResult(`✓ ${data.guest.name} checked in — invitation used for entrance`);
+        setScanResult(
+          `✓ ${data.guest?.inviteCode || data.guest?.name || "Guest"} checked in — status updated`
+        );
         setScanInput("");
         fetchData();
       } else if (data.duplicate) {
-        setScanResult(`⚠ ${data.guest.name} already checked in — one invitation, one entrance only`);
+        setScanResult(
+          `⚠ ${data.guest?.inviteCode || data.guest?.name || "QR"} already used — rejected`
+        );
       } else if (data.notAttending) {
-        setScanResult(`✗ ${data.guest?.name || "Guest"} did not confirm attendance`);
+        setScanResult(`✗ ${data.guest?.inviteCode || data.guest?.name || "Guest"} — entrance not allowed`);
       } else if (data.notInvited) {
         setScanResult(`✗ Not an invited guest`);
       } else {

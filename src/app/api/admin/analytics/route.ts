@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 import { coupleInfo } from "@/lib/images";
 
-export async function GET(request: Request) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export async function GET() {
   const [totalGuests, checkedIn, rsvps, guestbookCount, guestPhotoCount, couple] =
     await Promise.all([
       prisma.guest.count(),

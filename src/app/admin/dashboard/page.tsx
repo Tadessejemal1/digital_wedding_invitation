@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,15 +11,12 @@ import {
   CheckCircle,
   XCircle,
   QrCode,
-  LogOut,
   Copy,
   Check,
-  ImageIcon,
   Share2,
   Download,
 } from "lucide-react";
 import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
-import { GUEST_PHOTO_LIMIT } from "@/lib/guest-photos";
 
 interface Analytics {
   totalGuests: number;
@@ -47,7 +42,6 @@ interface Guest {
 }
 
 export default function AdminDashboard() {
-  const router = useRouter();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [scanInput, setScanInput] = useState("");
@@ -68,11 +62,6 @@ export default function AdminDashboard() {
       fetch("/api/guests"),
     ]);
 
-    if (analyticsRes.status === 401) {
-      router.push("/admin");
-      return;
-    }
-
     if (analyticsRes.ok) {
       const a = await analyticsRes.json();
       setAnalytics(a);
@@ -85,7 +74,7 @@ export default function AdminDashboard() {
         setCoupleId(guestList[0].coupleId);
       }
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -215,11 +204,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch("/api/admin/login", { method: "DELETE" });
-    router.push("/admin");
-  };
-
   const siteOrigin = () => {
     if (typeof window !== "undefined" && window.location.origin) {
       return window.location.origin.replace(/\/$/, "");
@@ -263,31 +247,9 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-ivory">
-      <header className="border-b border-gold/20 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <h1 className="font-display text-2xl text-wine">Admin Dashboard</h1>
-          <div className="flex items-center gap-2">
-            <Link href="/admin/photos">
-              <Button variant="outline">
-                <ImageIcon className="mr-1 h-4 w-4" />
-                Guest Photos
-                {typeof analytics?.guestPhotoCount === "number"
-                  ? ` (${analytics.guestPhotoCount}/${GUEST_PHOTO_LIMIT})`
-                  : ""}
-              </Button>
-            </Link>
-            <Link href="/admin/checkin">
-              <Button variant="gold">Entrance Scanner</Button>
-            </Link>
-            <Button variant="ghost" onClick={handleLogout}>
-              <LogOut className="h-4 w-4" /> Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
+    <div>
       <div className="mx-auto max-w-7xl space-y-8 p-6">
+        <h1 className="font-display text-2xl text-wine sm:text-3xl">Admin Dashboard</h1>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.label}>

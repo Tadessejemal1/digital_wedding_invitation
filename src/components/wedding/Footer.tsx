@@ -59,6 +59,11 @@ export function Footer({
             {DEVELOPER_PHONE}
           </a>
         </p>
+        <p className="mt-4">
+          <a href="/admin" className="text-xs text-white/40 underline-offset-2 hover:text-gold-light hover:underline">
+            Admin
+          </a>
+        </p>
       </div>
     </footer>
   );

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 import { resolveCoupleId } from "@/lib/couple";
 import {
   GUEST_PHOTO_ALLOWED_TYPES,
@@ -21,15 +20,14 @@ export async function HEAD() {
   });
 }
 
-/** Public status for upload UI. */
+/** Status + photo list for admin UI (no login). */
 export async function GET(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  const isAdmin = token ? await verifyAdminToken(token) : false;
+  const includePhotos = request.nextUrl.searchParams.get("photos") === "1";
 
   const count = await prisma.guestPhoto.count();
   const remaining = Math.max(0, GUEST_PHOTO_LIMIT - count);
 
-  if (!isAdmin) {
+  if (!includePhotos) {
     return NextResponse.json({
       count,
       limit: GUEST_PHOTO_LIMIT,

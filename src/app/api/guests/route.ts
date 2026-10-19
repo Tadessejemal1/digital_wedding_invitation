@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 import { resolveCoupleId } from "@/lib/couple";
 import { allocateEntranceTicket } from "@/lib/entrance-tickets";
 import { coupleInfo } from "@/lib/images";
@@ -16,11 +15,6 @@ const guestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const data = guestSchema.parse(body);
@@ -56,11 +50,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const coupleId = request.nextUrl.searchParams.get("coupleId");
   const guests = await prisma.guest.findMany({
     where: coupleId ? { coupleId } : undefined,

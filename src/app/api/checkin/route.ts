@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const { qrCode, guestId } = await request.json();
 

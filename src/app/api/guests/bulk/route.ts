@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 import { resolveCoupleId } from "@/lib/couple";
 import { allocateEntranceTicket } from "@/lib/entrance-tickets";
 import { coupleInfo } from "@/lib/images";
@@ -15,11 +14,6 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const data = bulkSchema.parse(body);
@@ -78,11 +72,6 @@ export async function POST(request: NextRequest) {
 
 /** Create blank entrance tickets EDENAND12R-01 … N (admin). */
 export async function PUT(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const body = await request.json().catch(() => ({}));
     const count = Math.min(

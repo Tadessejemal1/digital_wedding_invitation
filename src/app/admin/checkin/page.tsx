@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { QrCode, LogOut } from "lucide-react";
+import { QrCode } from "lucide-react";
 
 export default function CheckInScannerPage() {
-  const router = useRouter();
   const [scanInput, setScanInput] = useState("");
   const [scanResult, setScanResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,20 +49,10 @@ export default function CheckInScannerPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch("/api/admin/login", { method: "DELETE" });
-    router.push("/admin");
-  };
-
   return (
-    <div className="min-h-screen bg-wine p-4">
+    <div className="bg-wine p-4 min-h-[calc(100vh-3.5rem)]">
       <div className="mx-auto max-w-lg">
-        <div className="mb-6 flex items-center justify-between text-white">
-          <h1 className="font-display text-2xl">Entrance Scanner</h1>
-          <Button variant="ghost" className="text-white hover:text-gold-light" onClick={handleLogout}>
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
+        <h1 className="mb-6 font-display text-2xl text-white">Entrance Scanner</h1>
 
         <Card>
           <CardHeader>
@@ -74,7 +62,8 @@ export default function CheckInScannerPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-4 text-sm text-gray-500">
-              One invitation = one entrance. Scan once to mark the guest checked in. A second scan will be rejected.
+              One invitation = one entrance. Scan once to mark the guest checked in. A second scan
+              will be rejected.
             </p>
             <form onSubmit={handleScan} className="space-y-4">
               <Input

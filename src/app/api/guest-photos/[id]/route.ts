@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { verifyAdminToken, getAdminTokenFromCookie } from "@/lib/auth";
 
-async function requireAdmin(request: NextRequest) {
-  const token = getAdminTokenFromCookie(request.headers.get("cookie"));
-  if (!token || !(await verifyAdminToken(token))) {
-    return false;
-  }
-  return true;
-}
-
-/** Admin-only: stream image for preview. */
+/** Stream image for admin preview (no login). */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireAdmin(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
   const photo = await prisma.guestPhoto.findUnique({ where: { id } });
   if (!photo) {
@@ -34,15 +21,11 @@ export async function GET(
   });
 }
 
-/** Admin-only: delete a guest photo. */
+/** Delete a guest photo (no login). */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await requireAdmin(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await params;
   try {
     await prisma.guestPhoto.delete({ where: { id } });

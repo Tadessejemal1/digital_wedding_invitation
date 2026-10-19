@@ -5,9 +5,9 @@ export const weddingProgram = [
     description: "The celebration begins at the bridal and groom house.",
   },
   {
-    title: "Move to Abo Garden",
-    startTime: "2:00 PM",
-    description: "Guests proceed to Abo Garden for the next part of the celebration.",
+    title: "Photo Shoot",
+    startTime: "",
+    description: "Photo shoot with the couple, family, and guests.",
   },
   {
     title: "Abo Garden Dinner Program",

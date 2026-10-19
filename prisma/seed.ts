@@ -81,51 +81,32 @@ async function main() {
     })),
   });
 
-  const sampleGuests = [
-    {
-      name: "Kebede Tesfaye",
-      email: "kebede@example.com",
-      phone: "+251911111111",
-      inviteCode: "EDEN-KBDE",
-      qrCode: "KBDE1234",
-      invited: true,
-    },
-    {
-      name: "Almaz Desta",
-      email: "almaz@example.com",
-      phone: "+251922222222",
-      inviteCode: "EDEN-ALMZ",
-      qrCode: "ALMZ5678",
-      invited: true,
-    },
-    {
-      name: "Dawit Andinet",
-      email: "dawit@example.com",
-      phone: "+251933333333",
-      inviteCode: "EDEN-DAWT",
-      qrCode: "DAWT9012",
-      invited: true,
-    },
-  ];
+  // Anonymous entrance tickets: EDENAND12R-01 … EDENAND12R-350
+  const { ENTRANCE_TICKET_MAX, formatEntranceTicket } = await import("../src/lib/utils");
+  await prisma.guest.deleteMany({ where: { coupleId: couple.id } });
 
-  for (const g of sampleGuests) {
-    await prisma.guest.upsert({
-      where: { qrCode: g.qrCode },
-      update: {
-        inviteCode: g.inviteCode,
-        invited: true,
-        name: g.name,
-        email: g.email,
-        phone: g.phone,
-      },
-      create: { coupleId: couple.id, ...g },
-    });
+  const tickets = Array.from({ length: ENTRANCE_TICKET_MAX }, (_, i) => {
+    const n = i + 1;
+    const code = formatEntranceTicket(n);
+    return {
+      coupleId: couple.id,
+      name: `Guest ${String(n).padStart(2, "0")}`,
+      inviteCode: code,
+      qrCode: code,
+      invited: true,
+    };
+  });
+
+  // createMany in chunks to avoid payload limits
+  const chunkSize = 50;
+  for (let i = 0; i < tickets.length; i += chunkSize) {
+    await prisma.guest.createMany({ data: tickets.slice(i, i + chunkSize) });
   }
 
   console.log("Seed completed!");
   console.log(`Couple: ${couple.groomName} & ${couple.brideName}`);
   console.log(`Slug: /invite/${couple.slug}`);
-  console.log("Sample invite codes: EDEN-KBDE, EDEN-ALMZ, EDEN-DAWT");
+  console.log(`Entrance tickets: ${formatEntranceTicket(1)} … ${formatEntranceTicket(ENTRANCE_TICKET_MAX)}`);
 }
 
 main()

@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       guestId: guest.id,
       status: data.attending ? guest.status : "DECLINED",
       slug: couple?.slug || process.env.INVITE_SLUG || "ANDINET-EDEN",
-      // Entrance QR is only via personal /my-invite/[code] link from the hosts
+      // Entrance QR is only via personal /[code] link from the hosts
       qrAvailable: false,
     });
   } catch (error) {

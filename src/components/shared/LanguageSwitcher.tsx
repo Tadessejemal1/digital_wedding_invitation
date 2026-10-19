@@ -10,7 +10,9 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   const switchLocale = (newLocale: Locale) => {
-    router.replace(pathname, { locale: newLocale });
+    // Keep guest path (/CODE) and query; start at hero (no #check-in jump)
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    router.replace(`${pathname}${search}`, { locale: newLocale });
   };
 
   return (

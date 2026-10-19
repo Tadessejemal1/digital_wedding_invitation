@@ -26,10 +26,10 @@ export const amharicData = {
       startTime: "04:00 – 06:00 (ጠዋት/ከሰዓት)",
       description: "ክብረ በዓሉ በሙሽራ እና በሙሽሪት ቤት ይጀምራል።"
     },
-    "Move to Abo Garden": {
-      title: "ወደ አቦ ጋርደን",
-      startTime: "08:00 (ከሰዓት)",
-      description: "እንግዶች ወደ አቦ ጋርደን ያመራሉ።"
+    "Photo Shoot": {
+      title: "ፎቶ ሹት",
+      startTime: "",
+      description: "ከሙሽሮቹ፣ ከቤተሰብ እና ከእንግዶች ጋር ፎቶ ሹት።"
     },
     "Abo Garden Dinner Program": {
       title: "የአቦ ጋርደን የእራት ፕሮግራም",

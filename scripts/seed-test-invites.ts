@@ -1,41 +1,40 @@
 import { PrismaClient } from "@prisma/client";
+import { ENTRANCE_TICKET_MAX, formatEntranceTicket } from "../src/lib/utils";
 
 const prisma = new PrismaClient();
 const slug = process.env.INVITE_SLUG || "ANDINET-EDEN";
 
-const guests = [
-  { name: "Test Guest One", inviteCode: "EDEN-TEST1", qrCode: "TESTQR01", invited: true },
-  { name: "Test Guest Two", inviteCode: "EDEN-TEST2", qrCode: "TESTQR02", invited: true },
-  { name: "Test Guest Three", inviteCode: "EDEN-TEST3", qrCode: "TESTQR03", invited: true },
-];
-
 async function main() {
   const couple = await prisma.couple.findUnique({ where: { slug } });
   if (!couple) {
-    console.error("No couple for", slug);
-    process.exit(1);
+    throw new Error(`Couple ${slug} not found — run prisma/seed.ts first`);
   }
 
-  for (const g of guests) {
-    await prisma.guest.upsert({
-      where: { inviteCode: g.inviteCode },
-      update: { name: g.name, invited: true, qrCode: g.qrCode },
-      create: { coupleId: couple.id, ...g },
-    });
+  await prisma.guest.deleteMany({ where: { coupleId: couple.id } });
+
+  const tickets = Array.from({ length: ENTRANCE_TICKET_MAX }, (_, i) => {
+    const n = i + 1;
+    const code = formatEntranceTicket(n);
+    return {
+      coupleId: couple.id,
+      name: `Guest ${String(n).padStart(2, "0")}`,
+      inviteCode: code,
+      qrCode: code,
+      invited: true,
+    };
+  });
+
+  const chunkSize = 50;
+  for (let i = 0; i < tickets.length; i += chunkSize) {
+    await prisma.guest.createMany({ data: tickets.slice(i, i + chunkSize) });
   }
 
-  const origin = "http://localhost:3000";
-  console.log("Full-site Entrance Card links to test:\n");
-  for (const g of guests) {
-    console.log(g.name);
-    console.log(`  ${origin}/am?invite=${g.inviteCode}#check-in`);
-    console.log(`  ${origin}/en?invite=${g.inviteCode}#check-in\n`);
-  }
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  console.log(`Created ${ENTRANCE_TICKET_MAX} entrance tickets`);
+  console.log(`Example: ${origin}/${formatEntranceTicket(1)}`);
+  console.log(`Last:    ${origin}/${formatEntranceTicket(ENTRANCE_TICKET_MAX)}`);
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
+  .catch(console.error)
   .finally(() => prisma.$disconnect());

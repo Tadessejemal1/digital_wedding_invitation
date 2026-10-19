@@ -5,10 +5,13 @@ import { useTranslations } from "next-intl";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { GuestQrCard } from "@/components/invite/GuestQrCard";
+import { resolveGuestInviteCode } from "@/lib/guest-invite-url";
 
 interface EntranceCardSectionProps {
   coupleId: string;
   slug: string;
+  /** From personal path /CODE — preferred over query/session. */
+  inviteCode?: string;
 }
 
 interface EntrancePayload {
@@ -18,26 +21,20 @@ interface EntrancePayload {
   status: string;
 }
 
-/** Shown on the full public site only when the personal invite is in the URL (?invite=CODE). */
-export function EntranceCardSection({ slug }: EntranceCardSectionProps) {
+/** Shown when guest has a personal invite (path, query, or persisted session). */
+export function EntranceCardSection({ slug, inviteCode: pathInviteCode }: EntranceCardSectionProps) {
   const t = useTranslations("checkIn");
-  const [inviteCode, setInviteCode] = useState("");
+  const [inviteCode, setInviteCode] = useState(() =>
+    (pathInviteCode || "").trim().toUpperCase()
+  );
   const [data, setData] = useState<EntrancePayload | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const code = (params.get("invite") || params.get("code") || "").trim().toUpperCase();
+    const code = resolveGuestInviteCode(pathInviteCode);
     setInviteCode(code);
-
-    if (!code) return;
-
-    window.setTimeout(() => {
-      document.getElementById("check-in")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 500);
-  }, []);
+  }, [pathInviteCode]);
 
   useEffect(() => {
     if (!inviteCode) return;
@@ -69,7 +66,6 @@ export function EntranceCardSection({ slug }: EntranceCardSectionProps) {
     };
   }, [inviteCode, slug, t]);
 
-  // Public site without a personal invite: hide this section entirely
   if (!inviteCode) return null;
 
   return (

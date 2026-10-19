@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Camera } from "lucide-react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GUEST_PHOTO_LIMIT } from "@/lib/guest-photos";
 
 interface SharePhotoSectionProps {
   coupleId?: string;
@@ -23,23 +21,17 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [count, setCount] = useState(0);
-  const [remaining, setRemaining] = useState(GUEST_PHOTO_LIMIT);
-
-  const refreshStatus = async () => {
-    try {
-      const res = await fetch("/api/guest-photos");
-      if (!res.ok) return;
-      const data = await res.json();
-      setCount(data.count ?? 0);
-      setRemaining(data.remaining ?? 0);
-    } catch {
-      // ignore
-    }
-  };
+  const [full, setFull] = useState(false);
 
   useEffect(() => {
-    void refreshStatus();
+    void fetch("/api/guest-photos")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.full) setFull(true);
+      })
+      .catch(() => {
+        // ignore
+      });
   }, []);
 
   useEffect(() => {
@@ -74,17 +66,21 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error === "Photo limit reached" ? t("limitReached") : data.error || t("error"));
-        if (typeof data.remaining === "number") setRemaining(data.remaining);
-        if (typeof data.count === "number") setCount(data.count);
+        if (data.error === "Photo limit reached") {
+          setError(t("limitReached"));
+          setFull(true);
+        } else if (data.error === "Already shared") {
+          setError(t("alreadyShared"));
+        } else {
+          setError(data.error || t("error"));
+        }
         return;
       }
 
       setSuccess(true);
       setGuestName("");
       setFile(null);
-      setCount(data.count ?? count + 1);
-      setRemaining(data.remaining ?? Math.max(0, remaining - 1));
+      if (data.full) setFull(true);
       window.setTimeout(() => setSuccess(false), 4000);
     } catch {
       setError(t("error"));
@@ -92,8 +88,6 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
       setLoading(false);
     }
   };
-
-  const full = remaining <= 0;
 
   return (
     <section id="sharePhotos" className="section-padding bg-ivory">
@@ -104,16 +98,6 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
             onSubmit={handleSubmit}
             className="space-y-4 rounded-2xl border border-gold/20 bg-white p-8 shadow-md"
           >
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/20 bg-wine/[0.03] px-4 py-3 text-sm text-wine/80">
-              <span className="flex items-center gap-2">
-                <Camera className="h-4 w-4 text-gold" />
-                {t("slots", { count, limit: GUEST_PHOTO_LIMIT })}
-              </span>
-              <span className="font-medium text-wine">
-                {full ? t("full") : t("remaining", { remaining })}
-              </span>
-            </div>
-
             {full ? (
               <p className="text-center text-sm text-wine/70">{t("limitReached")}</p>
             ) : (
@@ -135,12 +119,11 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
                   <Input
                     id="share-photo"
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic"
+                    accept="image/*"
                     required
                     className="mt-1 cursor-pointer"
                     onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                   />
-                  <p className="mt-1 text-xs text-gray-500">{t("hint")}</p>
                 </div>
 
                 {preview && (

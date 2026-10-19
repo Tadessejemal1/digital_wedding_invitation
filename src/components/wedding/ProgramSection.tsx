@@ -18,8 +18,14 @@ interface ProgramSectionProps {
 function ProgramCard({ item }: { item: ProgramItem }) {
   return (
     <div className="rounded-xl border border-gold/20 bg-white p-4 shadow-md sm:p-6">
-      <time className="font-display text-base text-gold sm:text-lg">{item.startTime}</time>
-      <h3 className="font-display mt-1 text-lg text-wine sm:text-xl">{item.title}</h3>
+      {item.startTime?.trim() ? (
+        <time className="font-display text-base text-gold sm:text-lg">{item.startTime}</time>
+      ) : null}
+      <h3
+        className={`font-display text-lg text-wine sm:text-xl ${item.startTime?.trim() ? "mt-1" : ""}`}
+      >
+        {item.title}
+      </h3>
       {item.description && (
         <p className="mt-2 font-serif text-sm text-gray-600 sm:text-base">{item.description}</p>
       )}

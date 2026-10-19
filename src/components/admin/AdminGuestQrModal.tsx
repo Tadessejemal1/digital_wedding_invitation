@@ -23,8 +23,8 @@ export function AdminGuestQrModal({ guest, onClose }: AdminGuestQrModalProps) {
 
   const personalLink =
     typeof window !== "undefined"
-      ? `${window.location.origin}/am?invite=${encodeURIComponent(guest.inviteCode)}#check-in`
-      : `/am?invite=${guest.inviteCode}#check-in`;
+      ? `${window.location.origin}/${encodeURIComponent(guest.inviteCode)}`
+      : `/${guest.inviteCode}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -73,17 +73,16 @@ export function AdminGuestQrModal({ guest, onClose }: AdminGuestQrModalProps) {
           <X className="h-5 w-5" />
         </button>
 
-        <p className="font-display text-center text-xl text-wine">{guest.name}</p>
+        <p className="font-display text-center text-xl text-wine">{guest.inviteCode}</p>
         <p className="mt-2 rounded-lg bg-wine/5 px-3 py-2 text-center text-xs leading-relaxed text-wine">
-          Send this <strong>entrance QR image</strong> to the guest (WhatsApp / Telegram). They show it
-          once at the door. Optional: send the full-site link so they can also open the Entrance Card
-          on the wedding website.
+          Send this <strong>entrance QR</strong> (WhatsApp / Telegram). Whoever has it can enter once
+          at the door. Optional: send the site link so they can open the pass on the wedding website.
         </p>
 
         <div className="mx-auto my-5 flex h-[200px] w-[200px] items-center justify-center rounded-xl border border-gold/20 bg-white p-3">
           {qrDataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrDataUrl} alt={`${guest.name} entrance QR`} width={180} height={180} />
+            <img src={qrDataUrl} alt={`${guest.inviteCode} entrance QR`} width={180} height={180} />
           ) : (
             <div className="h-[180px] w-[180px] animate-pulse rounded-lg bg-ivory" />
           )}

@@ -211,8 +211,8 @@ export default function AdminDashboard() {
 
   const personalInviteLink = (inviteCode: string) => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    // Full public wedding site + Entrance Card section for this guest
-    return `${origin}/am?invite=${encodeURIComponent(inviteCode)}#check-in`;
+    // English default (no /en), opens at hero like the public site
+    return `${origin}/${encodeURIComponent(inviteCode)}`;
   };
 
   const inviteListText = guests

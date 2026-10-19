@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
+import { persistGuestInviteCode } from "@/lib/guest-invite-url";
 
-/** Old personal links redirect onto the full wedding site + Entrance Card. */
+/** Legacy /my-invite/CODE → personal /CODE (keeps guest context). */
 export default function MyInviteRedirectPage() {
   const params = useParams();
   const router = useRouter();
@@ -15,7 +16,8 @@ export default function MyInviteRedirectPage() {
       router.replace("/");
       return;
     }
-    router.replace(`/?invite=${encodeURIComponent(inviteCode)}#check-in`);
+    persistGuestInviteCode(inviteCode);
+    router.replace(`/${encodeURIComponent(inviteCode)}`);
   }, [inviteCode, router]);
 
   return (

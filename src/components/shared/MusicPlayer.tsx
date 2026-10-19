@@ -13,7 +13,7 @@ import {
   persistEnteredWithMusic,
 } from "@/lib/invite-unlock";
 
-const MUSIC_SRC = "/Eden/document_5956099425905417707.mp4";
+const MUSIC_SRC = `/Eden/${encodeURIComponent("Veronica_Adane_Abebaye_ቬሮኒካ_አዳነ_አበባዬ_12.mp3")}`;
 
 export function MusicPlayer() {
   const t = useTranslations("music");
@@ -22,7 +22,7 @@ export function MusicPlayer() {
   const [soundOn, setSoundOn] = useState(false);
   const [needsTap, setNeedsTap] = useState(false);
   const [ready, setReady] = useState(false);
-  const mediaRef = useRef<HTMLVideoElement>(null);
+  const mediaRef = useRef<HTMLAudioElement>(null);
   const showControls = !requirePassword || unlocked;
 
   const playWithSound = useCallback(async () => {
@@ -151,10 +151,9 @@ export function MusicPlayer() {
 
   return (
     <>
-      <video
+      <audio
         ref={mediaRef}
         loop
-        playsInline
         preload="auto"
         className="pointer-events-none fixed h-px w-px opacity-0"
         src={MUSIC_SRC}

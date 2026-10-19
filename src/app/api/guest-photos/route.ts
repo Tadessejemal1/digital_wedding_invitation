@@ -89,19 +89,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Photo file is required" }, { status: 400 });
     }
 
+    // One special photo per person (by name)
+    const alreadyShared = await prisma.guestPhoto.findFirst({
+      where: { guestName: { equals: guestName, mode: "insensitive" } },
+      select: { id: true },
+    });
+    if (alreadyShared) {
+      return NextResponse.json({ error: "Already shared" }, { status: 409 });
+    }
+
     const mimeType = file.type || "application/octet-stream";
     if (!GUEST_PHOTO_ALLOWED_TYPES.has(mimeType.toLowerCase())) {
-      return NextResponse.json(
-        { error: "Only JPG, PNG, WEBP, or HEIC photos are allowed" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid photo type" }, { status: 400 });
     }
 
     if (file.size <= 0 || file.size > GUEST_PHOTO_MAX_BYTES) {
-      return NextResponse.json(
-        { error: "Photo must be under 4 MB" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Photo is too large" }, { status: 400 });
     }
 
     const coupleId = await resolveCoupleId(
@@ -134,6 +137,7 @@ export async function POST(request: NextRequest) {
       count: newCount,
       limit: GUEST_PHOTO_LIMIT,
       remaining: Math.max(0, GUEST_PHOTO_LIMIT - newCount),
+      full: newCount >= GUEST_PHOTO_LIMIT,
     });
   } catch (error) {
     console.error("Guest photo upload error:", error);

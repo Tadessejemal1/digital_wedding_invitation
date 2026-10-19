@@ -4,7 +4,8 @@ import { createNavigation } from "next-intl/navigation";
 export const routing = defineRouting({
   locales: ["en", "am"],
   defaultLocale: "en",
-  localePrefix: "always",
+  // English has no /en prefix; Amharic stays /am/...
+  localePrefix: "as-needed",
   localeDetection: false,
 });
 

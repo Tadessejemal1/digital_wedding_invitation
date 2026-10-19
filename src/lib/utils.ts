@@ -42,12 +42,31 @@ function randomCode(length: number): string {
   return code;
 }
 
-/** Entrance QR identifier stored on the guest. */
+/** Entrance tickets: EDENAND12R-01 … EDENAND12R-340 */
+export const ENTRANCE_TICKET_PREFIX = "EDENAND12R";
+export const ENTRANCE_TICKET_MAX = 340;
+
+export function formatEntranceTicket(n: number): string {
+  return `${ENTRANCE_TICKET_PREFIX}-${String(n).padStart(2, "0")}`;
+}
+
+export function parseEntranceTicketNumber(code: string): number | null {
+  const match = code
+    .trim()
+    .toUpperCase()
+    .match(new RegExp(`^${ENTRANCE_TICKET_PREFIX}-(\\d+)$`));
+  if (!match) return null;
+  const n = Number(match[1]);
+  if (!Number.isFinite(n) || n < 1 || n > ENTRANCE_TICKET_MAX) return null;
+  return n;
+}
+
+/** @deprecated Prefer formatEntranceTicket — kept for rare fallback IDs. */
 export function generateQrCode(): string {
   return randomCode(8);
 }
 
-/** Personal invite / confirmation code shared with the guest (e.g. EDEN-A7K2). */
+/** @deprecated Prefer formatEntranceTicket — kept for rare fallback IDs. */
 export function generateInviteCode(prefix = "EDEN"): string {
   return `${prefix}-${randomCode(4)}`;
 }

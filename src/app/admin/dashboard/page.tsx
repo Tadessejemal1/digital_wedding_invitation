@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       if (a.coupleId) setCoupleId(a.coupleId);
     }
     if (guestsRes.ok) {
-      const guestList = sortByInviteCode(await guestsRes.json());
+      const guestList = sortByInviteCode((await guestsRes.json()) as Guest[]);
       setGuests(guestList);
       if (guestList.length > 0 && guestList[0].coupleId) {
         setCoupleId(guestList[0].coupleId);

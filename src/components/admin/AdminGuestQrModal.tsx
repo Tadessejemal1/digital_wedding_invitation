@@ -21,10 +21,11 @@ export function AdminGuestQrModal({ guest, onClose }: AdminGuestQrModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const personalLink =
+  const origin =
     typeof window !== "undefined"
-      ? `${window.location.origin}/${encodeURIComponent(guest.inviteCode)}`
-      : `/${guest.inviteCode}`;
+      ? window.location.origin.replace(/\/$/, "")
+      : (process.env.NEXT_PUBLIC_SITE_URL || "https://www.entro-wedding.com").replace(/\/$/, "");
+  const personalLink = `${origin}/${guest.inviteCode.trim().toUpperCase()}`;
 
   useEffect(() => {
     let cancelled = false;

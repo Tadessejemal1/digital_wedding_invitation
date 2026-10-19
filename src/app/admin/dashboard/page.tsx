@@ -8,7 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { coupleInfo } from "@/lib/images";
-import { Users, CheckCircle, XCircle, QrCode, LogOut, Copy, Check, ImageIcon } from "lucide-react";
+import {
+  Users,
+  CheckCircle,
+  XCircle,
+  QrCode,
+  LogOut,
+  Copy,
+  Check,
+  ImageIcon,
+  Share2,
+  Download,
+} from "lucide-react";
 import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
 import { GUEST_PHOTO_LIMIT } from "@/lib/guest-photos";
 
@@ -209,15 +220,40 @@ export default function AdminDashboard() {
     router.push("/admin");
   };
 
-  const personalInviteLink = (inviteCode: string) => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
-    // English default (no /en), opens at hero like the public site
-    return `${origin}/${encodeURIComponent(inviteCode)}`;
+  const siteOrigin = () => {
+    if (typeof window !== "undefined" && window.location.origin) {
+      return window.location.origin.replace(/\/$/, "");
+    }
+    return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.entro-wedding.com").replace(
+      /\/$/,
+      ""
+    );
   };
 
+  const personalInviteLink = (inviteCode: string) => {
+    // English default (no /en), opens at hero like the public site
+    return `${siteOrigin()}/${inviteCode.trim().toUpperCase()}`;
+  };
+
+  /** One share URL per line — easy to paste into WhatsApp / Telegram. */
+  const allLinksOnlyText = guests
+    .map((g) => personalInviteLink(g.inviteCode))
+    .join("\n");
+
+  /** Code + link pairs for labeled sharing. */
   const inviteListText = guests
-    .map((g) => `${g.name}\n${personalInviteLink(g.inviteCode)}`)
+    .map((g) => `${g.inviteCode}\n${personalInviteLink(g.inviteCode)}`)
     .join("\n\n");
+
+  const downloadAllLinks = () => {
+    const blob = new Blob([allLinksOnlyText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `wedding-invite-links-${guests.length}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const stats = [
     { label: "Total Guests", value: analytics?.totalGuests ?? 0, icon: Users, color: "text-wine" },
@@ -265,6 +301,93 @@ export default function AdminDashboard() {
             </Card>
           ))}
         </div>
+
+        <Card className="border-gold/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" /> Share all invitation links
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Public wedding site:{" "}
+              <a
+                href="https://www.entro-wedding.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-wine underline"
+              >
+                https://www.entro-wedding.com/
+              </a>
+              . Each guest gets a personal link like{" "}
+              <span className="font-mono text-xs text-wine">
+                https://www.entro-wedding.com/EDENAND12R-01
+              </span>
+              .
+            </p>
+            <p className="text-sm text-gray-500">
+              {guests.length} pass{guests.length === 1 ? "" : "es"} ready to share
+              {guests[0] ? (
+                <>
+                  {" "}
+                  ({guests[0].inviteCode}
+                  {guests.length > 1 ? ` … ${guests[guests.length - 1]?.inviteCode}` : ""})
+                </>
+              ) : null}
+              .
+            </p>
+            {guests.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="gold"
+                  onClick={() => copyText(allLinksOnlyText, "links-only")}
+                >
+                  {copiedId === "links-only" ? (
+                    <>
+                      <Check className="mr-1 h-4 w-4" /> All links copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-4 w-4" /> Copy all links
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => copyText(inviteListText, "bulk")}
+                >
+                  {copiedId === "bulk" ? (
+                    <>
+                      <Check className="mr-1 h-4 w-4" /> Codes + links copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-4 w-4" /> Copy codes + links
+                    </>
+                  )}
+                </Button>
+                <Button type="button" variant="outline" onClick={downloadAllLinks}>
+                  <Download className="mr-1 h-4 w-4" /> Download .txt
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-red-600">
+                No invitation passes in the database yet. Seed tickets or add guests first.
+              </p>
+            )}
+            {guests.length > 0 && (
+              <textarea
+                readOnly
+                rows={6}
+                value={allLinksOnlyText}
+                className="w-full rounded-md border border-gold/30 bg-white px-3 py-2 font-mono text-[11px] text-wine/90 focus:outline-none focus:ring-2 focus:ring-gold"
+                onFocus={(e) => e.currentTarget.select()}
+              />
+            )}
+          </CardContent>
+        </Card>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <Card>
@@ -398,25 +521,27 @@ export default function AdminDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-4">
-            <CardTitle>Guest List (invite codes)</CardTitle>
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4">
+            <CardTitle>Guest List ({guests.length} passes)</CardTitle>
             {guests.length > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => copyText(inviteListText, "bulk")}
-              >
-                {copiedId === "bulk" ? (
-                  <>
-                    <Check className="mr-1 h-4 w-4" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-1 h-4 w-4" /> Copy all personal links
-                  </>
-                )}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyText(allLinksOnlyText, "links-only-table")}
+                >
+                  {copiedId === "links-only-table" ? (
+                    <>
+                      <Check className="mr-1 h-4 w-4" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-4 w-4" /> Copy all links
+                    </>
+                  )}
+                </Button>
+              </div>
             )}
           </CardHeader>
           <CardContent>
@@ -450,7 +575,7 @@ export default function AdminDashboard() {
                             ) : (
                               <Copy className="h-3.5 w-3.5" />
                             )}
-                            Copy Entrance Card link
+                            Copy share link
                           </button>
                         </div>
                       </td>

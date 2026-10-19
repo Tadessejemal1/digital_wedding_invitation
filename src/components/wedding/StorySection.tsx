@@ -53,8 +53,8 @@ function CouplePortrait({
 export function StorySection({
   groomName,
   brideName,
-  brideImage = "/images/0K8A0023.JPG",
-  groomImage = "/images/0K8A0478.JPG",
+  brideImage = "/Eden/DSC05039-Recovered.jpg",
+  groomImage = "/Eden/DSC04900-Recovered.jpg",
   groomBio,
   brideBio,
   howTheyMet,

@@ -11,7 +11,7 @@ export function RingProgramCard() {
       <div className="relative h-[40%] shrink-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/invite/front-ceremony-clean.png"
+          src="/Eden/DSC05073-Recovered.jpg"
           alt=""
           className="absolute inset-0 h-full w-full object-cover object-[center_45%]"
         />

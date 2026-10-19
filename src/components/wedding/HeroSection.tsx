@@ -63,7 +63,7 @@ export function HeroSection({
       <div className="absolute inset-0 overflow-hidden">
         {/* Matching soft background (fills edges when zoomed out) */}
         <Image
-          src={coverImage || "/images/0K8A0230.JPG"}
+          src={coverImage || "/Eden/DSC05073-Recovered.jpg"}
           alt=""
           fill
           priority
@@ -74,7 +74,7 @@ export function HeroSection({
         />
         {/* Main photo — wider scale, slightly raised above invite text */}
         <Image
-          src={coverImage || "/images/0K8A0230.JPG"}
+          src={coverImage || "/Eden/DSC05073-Recovered.jpg"}
           alt={`${groomName} & ${brideName}`}
           fill
           priority

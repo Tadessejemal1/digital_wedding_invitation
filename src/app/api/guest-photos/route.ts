@@ -20,7 +20,7 @@ export async function HEAD() {
   });
 }
 
-/** Status + photo list for admin UI (no login). */
+/** Status (public) or photo list for admin (?photos=1, auth required). */
 export async function GET(request: NextRequest) {
   const includePhotos = request.nextUrl.searchParams.get("photos") === "1";
 

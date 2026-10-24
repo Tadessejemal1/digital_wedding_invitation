@@ -42,9 +42,9 @@ function randomCode(length: number): string {
   return code;
 }
 
-/** Entrance tickets: EDENAND12R-01 … EDENAND12R-340 */
+/** Entrance tickets: EDENAND12R-01 … EDENAND12R-500 */
 export const ENTRANCE_TICKET_PREFIX = "EDENAND12R";
-export const ENTRANCE_TICKET_MAX = 340;
+export const ENTRANCE_TICKET_MAX = 500;
 
 export function formatEntranceTicket(n: number): string {
   return `${ENTRANCE_TICKET_PREFIX}-${String(n).padStart(2, "0")}`;
@@ -61,7 +61,7 @@ export function parseEntranceTicketNumber(code: string): number | null {
   return n;
 }
 
-/** Sort key for invite codes like EDENAND12R-01 … EDENAND12R-340 (numeric, not text). */
+/** Sort key for invite codes like EDENAND12R-01 … EDENAND12R-500 (numeric, not text). */
 export function inviteCodeSortValue(code: string): number {
   const match = code.trim().toUpperCase().match(/-(\d+)$/);
   if (match) {

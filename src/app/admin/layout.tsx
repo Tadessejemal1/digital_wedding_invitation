@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Playfair_Display, Cormorant_Garamond, Poppins } from "next/font/google";
+import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import "../globals.css";
 
 const playfair = Playfair_Display({
@@ -60,12 +61,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </Link>
                 </nav>
               </div>
-              <Link
-                href="/"
-                className="rounded-md border border-gold/30 px-3 py-1.5 text-sm text-wine hover:bg-ivory"
-              >
-                Wedding site
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/"
+                  className="rounded-md border border-gold/30 px-3 py-1.5 text-sm text-wine hover:bg-ivory"
+                >
+                  Wedding site
+                </Link>
+                <AdminLogoutButton />
+              </div>
             </div>
           </header>
           {children}

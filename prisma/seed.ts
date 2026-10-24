@@ -81,7 +81,7 @@ async function main() {
     })),
   });
 
-  // Anonymous entrance tickets: EDENAND12R-01 … EDENAND12R-350
+  // Anonymous entrance tickets: EDENAND12R-01 … EDENAND12R-500
   const { ENTRANCE_TICKET_MAX, formatEntranceTicket } = await import("../src/lib/utils");
   await prisma.guest.deleteMany({ where: { coupleId: couple.id } });
 

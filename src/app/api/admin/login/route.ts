@@ -4,10 +4,16 @@ import { signAdminToken } from "@/lib/auth";
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const adminPassword = process.env.ADMIN_PASSWORD?.trim();
 
-    const valid = password === adminPassword;
-    if (!valid) {
+    if (!adminPassword) {
+      return NextResponse.json(
+        { error: "Admin password is not configured on the server" },
+        { status: 500 }
+      );
+    }
+
+    if (typeof password !== "string" || password !== adminPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
@@ -17,7 +23,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 86400,
+      maxAge: 60 * 60 * 24,
       path: "/",
     });
 
@@ -29,6 +35,12 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   const response = NextResponse.json({ success: true });
-  response.cookies.delete("admin_token");
+  response.cookies.set("admin_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
   return response;
 }

@@ -6,7 +6,7 @@ import {
   parseEntranceTicketNumber,
 } from "@/lib/utils";
 
-/** Next free ticket number for a couple (1–350). */
+/** Next free ticket number for a couple (1–500). */
 export async function allocateEntranceTicket(
   coupleId: string
 ): Promise<{ inviteCode: string; qrCode: string; number: number }> {

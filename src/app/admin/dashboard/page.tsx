@@ -57,6 +57,9 @@ export default function AdminDashboard() {
   const [bulkNames, setBulkNames] = useState("");
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkResult, setBulkResult] = useState("");
+  const [mintCount, setMintCount] = useState(160);
+  const [mintLoading, setMintLoading] = useState(false);
+  const [mintResult, setMintResult] = useState("");
 
   const fetchData = useCallback(async () => {
     const [analyticsRes, guestsRes] = await Promise.all([
@@ -201,6 +204,45 @@ export default function AdminDashboard() {
       setBulkResult("✗ Network error");
     } finally {
       setBulkLoading(false);
+    }
+  };
+
+  const handleMintTickets = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMintResult("");
+    const count = Math.max(1, Math.min(500, Number(mintCount) || 0));
+    if (!count) {
+      setMintResult("✗ Enter how many tickets to add");
+      return;
+    }
+    setMintLoading(true);
+    try {
+      const res = await fetch("/api/guests/bulk", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          count,
+          coupleId: coupleId || undefined,
+          slug: coupleInfo.slug,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const first = data.codes?.[0];
+        const last = data.codes?.[data.codes.length - 1];
+        setMintResult(
+          data.count
+            ? `✓ Added ${data.count} tickets${first ? ` (${first}${last && last !== first ? ` … ${last}` : ""})` : ""}`
+            : "✓ No new tickets — limit already filled (EDENAND12R-01 … 500)"
+        );
+        fetchData();
+      } else {
+        setMintResult(`✗ ${data.error || "Could not add tickets"}`);
+      }
+    } catch {
+      setMintResult("✗ Network error");
+    } finally {
+      setMintLoading(false);
     }
   };
 
@@ -448,9 +490,49 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
+        <Card className="border-gold/40">
+          <CardHeader>
+            <CardTitle>Add more entrance tickets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-3 text-sm text-gray-500">
+              Codes continue after the last one already in the database (e.g. after{" "}
+              <span className="font-mono text-wine">EDENAND12R-340</span> →{" "}
+              <span className="font-mono text-wine">EDENAND12R-341</span> …). Limit is{" "}
+              <span className="font-mono text-wine">EDENAND12R-500</span> (160 more after 340).
+            </p>
+            <form onSubmit={handleMintTickets} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <Label htmlFor="mint-count">How many to add</Label>
+                <Input
+                  id="mint-count"
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={mintCount}
+                  onChange={(e) => setMintCount(Number(e.target.value))}
+                  className="mt-1"
+                />
+              </div>
+              <Button type="submit" variant="gold" disabled={mintLoading} className="sm:min-w-[220px]">
+                {mintLoading ? "Adding…" : `Add ${mintCount || 0} tickets`}
+              </Button>
+            </form>
+            {mintResult && (
+              <p
+                className={`mt-3 text-center text-sm ${
+                  mintResult.startsWith("✓") ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {mintResult}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
-            <CardTitle>Bulk import (~350 guests)</CardTitle>
+            <CardTitle>Bulk import (up to 500 guests)</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-3 text-sm text-gray-500">

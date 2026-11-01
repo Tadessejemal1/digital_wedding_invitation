@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
               ],
             }
           : undefined,
-      include: { rsvp: true },
     });
 
     if (!guest) {
@@ -67,6 +66,9 @@ export async function POST(request: NextRequest) {
     const usedScans =
       guest.status === "CHECKED_IN" ? Math.max(guest.scanCount, 1) : guest.scanCount;
 
+    const newScanCount = usedScans + 1;
+    const checkedInAt = guest.checkedInAt ?? new Date();
+
     // Atomic increment guarded by the limit, so two simultaneous scans can't both pass
     const claimed =
       usedScans < MAX_ENTRANCE_SCANS
@@ -74,8 +76,8 @@ export async function POST(request: NextRequest) {
             where: { id: guest.id, scanCount: guest.scanCount },
             data: {
               status: "CHECKED_IN",
-              scanCount: usedScans + 1,
-              checkedInAt: guest.checkedInAt ?? new Date(),
+              scanCount: newScanCount,
+              checkedInAt,
             },
           })
         : { count: 0 };
@@ -101,12 +103,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const updated = await prisma.guest.findUniqueOrThrow({
-      where: { id: guest.id },
-    });
-
-    // Ensure attendance is marked so dashboard stats stay consistent
-    await prisma.rsvp.upsert({
+    // Ensure attendance is marked so dashboard stats stay consistent (not awaited before replying)
+    void prisma.rsvp
+      .upsert({
       where: { guestId: guest.id },
       create: {
         guestId: guest.id,
@@ -115,19 +114,20 @@ export async function POST(request: NextRequest) {
         plusOne: false,
       },
       update: { attendance: true },
-    });
+      })
+      .catch((err) => console.error("Check-in RSVP sync failed:", err));
 
     return NextResponse.json({
       success: true,
       guest: {
-        id: updated.id,
-        name: updated.name,
-        inviteCode: updated.inviteCode,
-        status: updated.status,
-        checkedInAt: updated.checkedInAt,
-        scanCount: updated.scanCount,
+        id: guest.id,
+        name: guest.name,
+        inviteCode: guest.inviteCode,
+        status: "CHECKED_IN",
+        checkedInAt,
+        scanCount: newScanCount,
       },
-      scansRemaining: MAX_ENTRANCE_SCANS - updated.scanCount,
+      scansRemaining: MAX_ENTRANCE_SCANS - newScanCount,
       message: "Entrance checked in successfully",
     });
   } catch {

@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Camera, CheckCircle2, QrCode, XCircle } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, QrCode, Volume2, XCircle } from "lucide-react";
 import { parseQrPayload } from "@/lib/qr";
 import { playRejectSound, playSuccessSound, unlockScanSounds } from "@/lib/scan-sounds";
 
@@ -13,7 +13,7 @@ type ScanKind = "success" | "duplicate" | "error" | "";
 
 const CAMERA_ELEMENT_ID = "entrance-qr-reader";
 /** Result stays on screen (camera paused) this long, unless "Scan next" is tapped. */
-const RESULT_HOLD_MS = 5000;
+const RESULT_HOLD_MS = 2500;
 /** Same QR is ignored this long, so a code left in front of the camera isn't used twice. */
 const SAME_CODE_COOLDOWN_MS = 15000;
 
@@ -26,6 +26,7 @@ export default function CheckInScannerPage() {
   const [cameraError, setCameraError] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
   const [manualMode, setManualMode] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const processingRef = useRef(false);
@@ -46,10 +47,18 @@ export default function CheckInScannerPage() {
 
   useEffect(() => () => window.clearTimeout(resumeTimerRef.current), []);
 
-  // Phones block audio until the first tap on the page
+  // Phones block audio until a tap on the page — any tap (or the button) unlocks it
   useEffect(() => {
-    window.addEventListener("pointerdown", unlockScanSounds, { once: true });
-    return () => window.removeEventListener("pointerdown", unlockScanSounds);
+    const unlock = () => {
+      void unlockScanSounds().then((ok) => {
+        if (ok) {
+          setSoundOn(true);
+          window.removeEventListener("pointerdown", unlock);
+        }
+      });
+    };
+    window.addEventListener("pointerdown", unlock);
+    return () => window.removeEventListener("pointerdown", unlock);
   }, []);
 
   const processCheckIn = useCallback(async (raw: string, fromCamera = false) => {
@@ -61,12 +70,23 @@ export default function CheckInScannerPage() {
 
     const dedupeKey = qrCode || guestId || "";
     // Ignore rapid duplicate camera frames for the same code
+    if (processingRef.current) return;
+
+    // Same QR still in front of the camera: answer instantly without using another entrance
     if (
-      processingRef.current ||
-      (fromCamera &&
-        dedupeKey === lastCodeRef.current &&
-        now - lastScanAtRef.current < SAME_CODE_COOLDOWN_MS)
+      fromCamera &&
+      dedupeKey === lastCodeRef.current &&
+      now - lastScanAtRef.current < SAME_CODE_COOLDOWN_MS
     ) {
+      pausedRef.current = true;
+      setScanKind("duplicate");
+      setScanResult("Just scanned — move to next guest");
+      setGuestLabel("");
+      window.clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = window.setTimeout(() => {
+        pausedRef.current = false;
+        setScanKind("");
+      }, 1500);
       return;
     }
 
@@ -145,7 +165,12 @@ export default function CheckInScannerPage() {
     if (manualMode) return;
 
     let cancelled = false;
-    const scanner = new Html5Qrcode(CAMERA_ELEMENT_ID);
+    // Native BarcodeDetector (Android Chrome, newer Safari) decodes much faster than the JS fallback
+    const scanner = new Html5Qrcode(CAMERA_ELEMENT_ID, {
+      verbose: false,
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+    });
     scannerRef.current = scanner;
 
     const start = async () => {
@@ -153,9 +178,10 @@ export default function CheckInScannerPage() {
         await scanner.start(
           { facingMode: "environment" },
           {
-            fps: 8,
+            fps: 15,
+            disableFlip: true,
             qrbox: (viewW, viewH) => {
-              const side = Math.min(Math.floor(viewW * 0.75), Math.floor(viewH * 0.55), 280);
+              const side = Math.min(Math.floor(viewW * 0.8), Math.floor(viewH * 0.8), 340);
               return { width: side, height: side };
             },
             aspectRatio: 1.333,
@@ -225,7 +251,7 @@ export default function CheckInScannerPage() {
       {scanKind === "success" && (
         <p className="mt-3 text-sm text-green-700/80">Status updated to Checked In</p>
       )}
-      {scanKind === "duplicate" && (
+      {scanKind === "duplicate" && guestLabel && (
         <p className="mt-3 text-sm text-amber-800/80">
           This pass was already used — do not allow entrance
         </p>
@@ -247,6 +273,12 @@ export default function CheckInScannerPage() {
     <div className="min-h-[calc(100vh-3.5rem)] bg-wine p-4">
       <div className="mx-auto max-w-lg space-y-4">
         <h1 className="font-display text-2xl text-white">Entrance Scanner</h1>
+
+        {!soundOn && (
+          <Button type="button" variant="gold" size="lg" className="w-full">
+            <Volume2 className="mr-2 h-5 w-5" /> Tap to turn on sound
+          </Button>
+        )}
 
         <Card>
           <CardHeader>

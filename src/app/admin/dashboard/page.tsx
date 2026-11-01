@@ -15,6 +15,7 @@ import {
   Check,
   Share2,
   Download,
+  RotateCcw,
 } from "lucide-react";
 import { AdminGuestQrModal } from "@/components/admin/AdminGuestQrModal";
 import { parseQrPayload } from "@/lib/qr";
@@ -60,6 +61,8 @@ export default function AdminDashboard() {
   const [mintCount, setMintCount] = useState(160);
   const [mintLoading, setMintLoading] = useState(false);
   const [mintResult, setMintResult] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetResult, setResetResult] = useState("");
 
   const fetchData = useCallback(async () => {
     const [analyticsRes, guestsRes] = await Promise.all([
@@ -92,6 +95,33 @@ export default function AdminDashboard() {
       window.setTimeout(() => setCopiedId(null), 2000);
     } catch {
       // ignore
+    }
+  };
+
+  const handleResetCheckins = async () => {
+    const checkedIn = analytics?.checkedIn ?? guests.filter((g) => g.status === "CHECKED_IN").length;
+    const ok = window.confirm(
+      checkedIn > 0
+        ? `Reset ${checkedIn} check-in${checkedIn === 1 ? "" : "s"}? All scanned QRs will work again from scratch.`
+        : "No one is checked in right now. Continue anyway?"
+    );
+    if (!ok) return;
+
+    setResetLoading(true);
+    setResetResult("");
+    try {
+      const res = await fetch("/api/admin/reset-checkins", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setResetResult(`✓ Reset ${data.count ?? 0} check-in${data.count === 1 ? "" : "s"} — ready for fresh scans`);
+        await fetchData();
+      } else {
+        setResetResult(`✗ ${data.error || "Reset failed"}`);
+      }
+    } catch {
+      setResetResult("✗ Network error");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -305,6 +335,39 @@ export default function AdminDashboard() {
             </Card>
           ))}
         </div>
+
+        <Card className="border-amber-200 bg-amber-50/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-wine">
+              <RotateCcw className="h-5 w-5" /> Reset check-ins
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-gray-600">
+              Clear all entrance scans so every QR can be checked in again. Currently checked in:{" "}
+              <strong className="text-wine">{analytics?.checkedIn ?? 0}</strong>.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={resetLoading}
+              onClick={() => void handleResetCheckins()}
+              className="border-amber-400 text-wine hover:bg-amber-100"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {resetLoading ? "Resetting…" : "Reset all check-ins"}
+            </Button>
+            {resetResult && (
+              <p
+                className={`text-sm ${
+                  resetResult.startsWith("✓") ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {resetResult}
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         <Card className="border-gold/40">
           <CardHeader>

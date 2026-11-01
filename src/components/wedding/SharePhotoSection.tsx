@@ -7,6 +7,7 @@ import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { compressImage } from "@/lib/compress-image";
 
 interface SharePhotoSectionProps {
   coupleId?: string;
@@ -58,7 +59,7 @@ export function SharePhotoSection({ coupleId, slug }: SharePhotoSectionProps) {
     try {
       const form = new FormData();
       form.set("guestName", guestName.trim());
-      form.set("photo", file);
+      form.set("photo", await compressImage(file));
       if (coupleId) form.set("coupleId", coupleId);
       if (slug) form.set("slug", slug);
 

@@ -7,10 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Camera, CheckCircle2, QrCode, XCircle } from "lucide-react";
 import { parseQrPayload } from "@/lib/qr";
+import { playRejectSound, playSuccessSound, unlockScanSounds } from "@/lib/scan-sounds";
 
 type ScanKind = "success" | "duplicate" | "error" | "";
 
 const CAMERA_ELEMENT_ID = "entrance-qr-reader";
+/** Result stays on screen (camera paused) this long, unless "Scan next" is tapped. */
+const RESULT_HOLD_MS = 5000;
+/** Same QR is ignored this long, so a code left in front of the camera isn't used twice. */
+const SAME_CODE_COOLDOWN_MS = 15000;
 
 export default function CheckInScannerPage() {
   const [scanInput, setScanInput] = useState("");
@@ -26,10 +31,30 @@ export default function CheckInScannerPage() {
   const processingRef = useRef(false);
   const lastCodeRef = useRef("");
   const lastScanAtRef = useRef(0);
+  const pausedRef = useRef(false);
+  const resumeTimerRef = useRef<number | undefined>(undefined);
   const linkBootstrappedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const processCheckIn = useCallback(async (raw: string) => {
+  const resumeScanning = useCallback(() => {
+    window.clearTimeout(resumeTimerRef.current);
+    pausedRef.current = false;
+    setScanKind("");
+    setScanResult("");
+    setGuestLabel("");
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(resumeTimerRef.current), []);
+
+  // Phones block audio until the first tap on the page
+  useEffect(() => {
+    window.addEventListener("pointerdown", unlockScanSounds, { once: true });
+    return () => window.removeEventListener("pointerdown", unlockScanSounds);
+  }, []);
+
+  const processCheckIn = useCallback(async (raw: string, fromCamera = false) => {
+    // Camera is paused while a result is shown
+    if (fromCamera && pausedRef.current) return;
     const now = Date.now();
     const { qrCode, guestId } = parseQrPayload(raw);
     if (!qrCode && !guestId) return;
@@ -38,12 +63,16 @@ export default function CheckInScannerPage() {
     // Ignore rapid duplicate camera frames for the same code
     if (
       processingRef.current ||
-      (dedupeKey === lastCodeRef.current && now - lastScanAtRef.current < 4000)
+      (fromCamera &&
+        dedupeKey === lastCodeRef.current &&
+        now - lastScanAtRef.current < SAME_CODE_COOLDOWN_MS)
     ) {
       return;
     }
 
     processingRef.current = true;
+    pausedRef.current = true;
+    window.clearTimeout(resumeTimerRef.current);
     lastCodeRef.current = dedupeKey;
     lastScanAtRef.current = now;
     setLoading(true);
@@ -59,6 +88,9 @@ export default function CheckInScannerPage() {
       });
       const data = await res.json();
       const codeLabel = data.guest?.inviteCode || qrCode;
+
+      if (res.ok) playSuccessSound();
+      else playRejectSound();
 
       if (res.ok) {
         setScanKind("success");
@@ -84,11 +116,17 @@ export default function CheckInScannerPage() {
         window.history.replaceState({}, "", "/admin/checkin");
       }
     } catch {
+      playRejectSound();
       setScanKind("error");
       setScanResult("Network error");
     } finally {
       setLoading(false);
       processingRef.current = false;
+      lastScanAtRef.current = Date.now();
+      resumeTimerRef.current = window.setTimeout(() => {
+        pausedRef.current = false;
+        setScanKind("");
+      }, RESULT_HOLD_MS);
     }
   }, []);
 
@@ -123,7 +161,7 @@ export default function CheckInScannerPage() {
             aspectRatio: 1.333,
           },
           (decoded) => {
-            void processCheckIn(decoded);
+            void processCheckIn(decoded, true);
           },
           () => {
             /* ignore frame-level "not found" */
@@ -163,6 +201,41 @@ export default function CheckInScannerPage() {
     };
   }, [manualMode, processCheckIn]);
 
+  const resultCard = scanKind ? (
+    <div
+      className={`flex flex-col items-center rounded-2xl p-6 text-center shadow-xl ${
+        scanKind === "success"
+          ? "bg-green-50 text-green-700"
+          : scanKind === "duplicate"
+            ? "bg-amber-50 text-amber-800"
+            : "bg-red-50 text-red-700"
+      }`}
+    >
+      {scanKind === "success" && (
+        <CheckCircle2 className="mb-3 h-16 w-16 text-green-600" strokeWidth={1.75} />
+      )}
+      {scanKind === "duplicate" && (
+        <AlertTriangle className="mb-3 h-16 w-16 text-amber-600" strokeWidth={1.75} />
+      )}
+      {scanKind === "error" && (
+        <XCircle className="mb-3 h-16 w-16 text-red-600" strokeWidth={1.75} />
+      )}
+      <p className="font-display text-2xl">{scanResult}</p>
+      {guestLabel && <p className="mt-2 font-mono text-sm opacity-80">{guestLabel}</p>}
+      {scanKind === "success" && (
+        <p className="mt-3 text-sm text-green-700/80">Status updated to Checked In</p>
+      )}
+      {scanKind === "duplicate" && (
+        <p className="mt-3 text-sm text-amber-800/80">
+          This pass was already used — do not allow entrance
+        </p>
+      )}
+      <Button type="button" variant="gold" className="mt-4 w-full" onClick={resumeScanning}>
+        Scan next guest
+      </Button>
+    </div>
+  ) : null;
+
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!scanInput.trim()) return;
@@ -184,12 +257,24 @@ export default function CheckInScannerPage() {
           <CardContent className="space-y-4">
             <p className="text-sm text-gray-500">
               Works both ways: open this page and scan with the camera, or scan the QR with the phone
-              Camera app (opens this page and shows the result). One QR = one entrance.
+              Camera app (opens this page and shows the result). 
             </p>
 
             {!manualMode && (
-              <div className="overflow-hidden rounded-xl border border-gold/30 bg-black">
-                <div id={CAMERA_ELEMENT_ID} className="min-h-[260px] w-full" />
+              <div className="relative overflow-hidden rounded-xl border border-gold/30 bg-black">
+                <div id={CAMERA_ELEMENT_ID} className="min-h-[360px] w-full" />
+                {/* Result covers the camera area; scanning is paused until it closes */}
+                {(loading || resultCard) && !cameraError && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto bg-black/60 p-3">
+                    {loading ? (
+                      <p className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-wine">
+                        Checking invitation…
+                      </p>
+                    ) : (
+                      <div className="w-full">{resultCard}</div>
+                    )}
+                  </div>
+                )}
                 {!cameraReady && !cameraError && (
                   <p className="p-4 text-center text-sm text-white/70">Starting camera…</p>
                 )}
@@ -200,41 +285,11 @@ export default function CheckInScannerPage() {
               <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">{cameraError}</p>
             )}
 
-            {loading && (
+            {loading && manualMode && (
               <p className="text-center text-sm font-medium text-wine">Checking invitation…</p>
             )}
 
-            {scanKind && (
-              <div
-                className={`flex flex-col items-center rounded-2xl p-6 text-center ${
-                  scanKind === "success"
-                    ? "bg-green-50 text-green-700"
-                    : scanKind === "duplicate"
-                      ? "bg-amber-50 text-amber-800"
-                      : "bg-red-50 text-red-700"
-                }`}
-              >
-                {scanKind === "success" && (
-                  <CheckCircle2 className="mb-3 h-16 w-16 text-green-600" strokeWidth={1.75} />
-                )}
-                {scanKind === "duplicate" && (
-                  <AlertTriangle className="mb-3 h-16 w-16 text-amber-600" strokeWidth={1.75} />
-                )}
-                {scanKind === "error" && (
-                  <XCircle className="mb-3 h-16 w-16 text-red-600" strokeWidth={1.75} />
-                )}
-                <p className="font-display text-2xl">{scanResult}</p>
-                {guestLabel && <p className="mt-2 font-mono text-sm opacity-80">{guestLabel}</p>}
-                {scanKind === "success" && (
-                  <p className="mt-3 text-sm text-green-700/80">Status updated to Checked In</p>
-                )}
-                {scanKind === "duplicate" && (
-                  <p className="mt-3 text-sm text-amber-800/80">
-                    This pass was already used — do not allow entrance
-                  </p>
-                )}
-              </div>
-            )}
+            {(manualMode || cameraError) && resultCard}
 
             <div className="flex gap-2">
               <Button

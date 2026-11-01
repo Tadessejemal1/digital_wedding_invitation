@@ -8,16 +8,25 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Only status + checkedInAt — production DB may not have scan_count yet
-  const result = await prisma.guest.updateMany({
-    where: { status: "CHECKED_IN" },
-    data: {
-      status: "PENDING",
-      checkedInAt: null,
-    },
-  });
+  // Prefer raw SQL so scan_count is cleared when the column exists
+  let count = 0;
+  try {
+    count = await prisma.$executeRawUnsafe(`
+      UPDATE weedings.guests
+      SET status = 'PENDING',
+          checked_in_at = NULL,
+          scan_count = 0
+      WHERE status = 'CHECKED_IN' OR COALESCE(scan_count, 0) > 0
+    `);
+  } catch {
+    const result = await prisma.guest.updateMany({
+      where: { status: "CHECKED_IN" },
+      data: { status: "PENDING", checkedInAt: null },
+    });
+    count = result.count;
+  }
 
-  console.log(`Reset ${result.count} checked-in guest(s) → PENDING (fresh scans ready)`);
+  console.log(`Reset ${count} guest(s) → PENDING (fresh scans ready)`);
 }
 
 main()

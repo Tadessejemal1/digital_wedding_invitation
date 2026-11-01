@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { parseQrPayload } from "@/lib/qr";
 
+/** How many times one invitation QR can be scanned for entrance. */
+const MAX_ENTRANCE_SCANS = 2;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -48,26 +51,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // One invitation QR = one entrance only — reject on any later scan
-    if (guest.status === "CHECKED_IN") {
-      return NextResponse.json(
-        {
-          error: "Already checked in — this QR was used and is now rejected",
-          guest: {
-            id: guest.id,
-            name: guest.name,
-            inviteCode: guest.inviteCode,
-            status: guest.status,
-            checkedInAt: guest.checkedInAt,
-          },
-          duplicate: true,
-          rejected: true,
-          checkedInAt: guest.checkedInAt,
-        },
-        { status: 409 }
-      );
-    }
-
     if (guest.status === "DECLINED") {
       return NextResponse.json(
         {
@@ -80,10 +63,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const updated = await prisma.guest.update({
+    // Legacy check-ins (before scanCount existed) count as one used scan
+    const usedScans =
+      guest.status === "CHECKED_IN" ? Math.max(guest.scanCount, 1) : guest.scanCount;
+
+    // Atomic increment guarded by the limit, so two simultaneous scans can't both pass
+    const claimed =
+      usedScans < MAX_ENTRANCE_SCANS
+        ? await prisma.guest.updateMany({
+            where: { id: guest.id, scanCount: guest.scanCount },
+            data: {
+              status: "CHECKED_IN",
+              scanCount: usedScans + 1,
+              checkedInAt: guest.checkedInAt ?? new Date(),
+            },
+          })
+        : { count: 0 };
+
+    // Each invitation QR allows MAX_ENTRANCE_SCANS entrances — reject after that
+    if (claimed.count === 0) {
+      return NextResponse.json(
+        {
+          error: "Rejected — already used",
+          guest: {
+            id: guest.id,
+            name: guest.name,
+            inviteCode: guest.inviteCode,
+            status: guest.status,
+            checkedInAt: guest.checkedInAt,
+            scanCount: Math.max(usedScans, MAX_ENTRANCE_SCANS),
+          },
+          duplicate: true,
+          rejected: true,
+          checkedInAt: guest.checkedInAt,
+        },
+        { status: 409 }
+      );
+    }
+
+    const updated = await prisma.guest.findUniqueOrThrow({
       where: { id: guest.id },
-      data: { status: "CHECKED_IN", checkedInAt: new Date() },
-      include: { rsvp: true },
     });
 
     // Ensure attendance is marked so dashboard stats stay consistent
@@ -106,8 +125,10 @@ export async function POST(request: NextRequest) {
         inviteCode: updated.inviteCode,
         status: updated.status,
         checkedInAt: updated.checkedInAt,
+        scanCount: updated.scanCount,
       },
-      message: "Checked in successfully — invitation used for entrance",
+      scansRemaining: MAX_ENTRANCE_SCANS - updated.scanCount,
+      message: "Entrance checked in successfully",
     });
   } catch {
     return NextResponse.json({ error: "Check-in failed", rejected: true }, { status: 400 });

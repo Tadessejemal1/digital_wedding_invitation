@@ -63,11 +63,11 @@ export default function CheckInScannerPage() {
       if (res.ok) {
         setScanKind("success");
         setGuestLabel(codeLabel);
-        setScanResult("Checked in successfully");
+        setScanResult("Entrance checked in successfully");
       } else if (data.duplicate) {
         setScanKind("duplicate");
         setGuestLabel(codeLabel);
-        setScanResult("Already used — QR rejected");
+        setScanResult("Rejected — already used");
       } else if (data.notAttending) {
         setScanKind("error");
         setGuestLabel(codeLabel);

@@ -97,6 +97,8 @@ model Guest {
   invited     Boolean     @default(true)
   status      GuestStatus @default(PENDING)
   checkedInAt DateTime?   @map("checked_in_at")
+  /** Number of successful entrance scans (max MAX_ENTRANCE_SCANS). */
+  scanCount   Int         @default(0) @map("scan_count")
 
   couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   rsvp   Rsvp?
